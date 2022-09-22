@@ -93,7 +93,7 @@ class GitHubGqlAPI:
             return result
         for vendor in data['data']['repository']['object']['entries']:
             result[vendor['name']] = {}
-            for model in vendor['object']['entries']:
+            for model in vendor['object'].get('entries', []):
                 result[vendor['name']].update({model['name']: {'sha': model['object']['oid']}})
         return result
 
