@@ -10,7 +10,7 @@ class NetBoxMetatypeImporterConfig(PluginConfig):
     author = 'Nikolay Yuzefovich'
     author_email = 'mgk.kolek@gmail.com'
     required_settings = []
-    min_version = '3.3.99'
+    min_version = '3.4.1'
     max_version = '3.4.99'
     default_settings = {
         'repo_owner': 'netbox-community',
