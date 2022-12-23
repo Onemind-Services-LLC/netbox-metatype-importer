@@ -48,7 +48,7 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
     path = None
 
     def get_required_permission(self):
-        return 'netbox_metatype_importer.add_Metatype'
+        return 'netbox_metatype_importer.add_metatype'
 
     def post(self, request):
         loaded = 0
