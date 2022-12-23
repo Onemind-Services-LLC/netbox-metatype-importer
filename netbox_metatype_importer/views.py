@@ -125,7 +125,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
     ))
 
     def get_required_permission(self):
-        return 'netbox_metatype_importer.add_Metatype'
+        return 'netbox_metatype_importer.add_metatype'
 
     def post(self, request):
         return_url = self.get_return_url(request)
