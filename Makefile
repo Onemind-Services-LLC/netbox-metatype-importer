@@ -3,8 +3,8 @@ NETBOX_VER?=v3.2.0
 
 
 COMPOSE_FILE=./develop/docker-compose.yml
-BUILD_NAME=netbox_devicetype_importer
-VERFILE=./netbox_devicetype_importer/version.py
+BUILD_NAME=netbox_metatype_importer
+VERFILE=./netbox_metatype_importer/version.py
 
 
 cbuild:
@@ -26,7 +26,7 @@ stop:
 
 destroy:
 	docker-compose -f ${COMPOSE_FILE} -p ${BUILD_NAME} down
-	docker volume rm -f ${BUILD_NAME}_pgdata_netbox_devicetype_importer
+	docker volume rm -f ${BUILD_NAME}_pgdata_netbox_metatype_importer
 
 nbshell:
 	docker-compose -f ${COMPOSE_FILE} -p ${BUILD_NAME} run netbox python manage.py nbshell

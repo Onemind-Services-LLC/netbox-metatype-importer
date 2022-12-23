@@ -18,14 +18,14 @@ pip install netbox-devicetype-importer
 ```
 Enable the plugin in [NetBox Configuration](https://netbox.readthedocs.io/en/stable/configuration/)
 ```
-PLUGINS = ['netbox_devicetype_importer']
+PLUGINS = ['netbox_metatype_importer']
 ```
 
 ## Configuration
 Put your GitHub personal access token to [NetBox plugins config](https://netbox.readthedocs.io/en/stable/configuration/optional-settings/#plugins_config)
 ```
 PLUGINS_CONFIG = {
-    'netbox_devicetype_importer': {
+    'netbox_metatype_importer': {
         'github_token': '<YOUR-GITHUB-TOKEN>'
     }
 }

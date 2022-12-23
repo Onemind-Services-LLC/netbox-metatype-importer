@@ -5,7 +5,7 @@ except ImportError:
     from netbox.tables import BaseTable
     from netbox.tables.columns import ToggleColumn
 
-from .models import MetaDeviceType
+from .models import MetaType
 
 
 class MetaTypeTable(BaseTable):
@@ -16,6 +16,6 @@ class MetaTypeTable(BaseTable):
         return '{}'.format(value.split('.')[0])
 
     class Meta(BaseTable.Meta):
-        model = MetaDeviceType
+        model = MetaType
         fields = ('pk', 'name', 'vendor', 'is_new', 'is_imported')
         default_columns = ('pk', 'name', 'vendor', 'is_imported')

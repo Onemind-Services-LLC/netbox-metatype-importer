@@ -17,38 +17,38 @@ from utilities.exceptions import AbortTransaction, PermissionsViolation
 from utilities.forms import ImportForm, restrict_form_fields
 from utilities.views import ContentTypePermissionRequiredMixin, GetReturnURLMixin
 from .choices import TypeChoices
-from .filters import MetaDeviceTypeFilterSet
-from .forms import MetaDeviceTypeFilterForm
+from .filters import MetaTypeFilterSet
+from .forms import MetaTypeFilterForm
 from .gql import GQLError, GitHubGqlAPI
-from .models import MetaDeviceType
+from .models import MetaType
 from .tables import MetaTypeTable
 
 
 class MetaDeviceTypeListView(generic.ObjectListView):
-    queryset = MetaDeviceType.objects.filter(type=TypeChoices.TYPE_DEVICE)
-    filterset = MetaDeviceTypeFilterSet
-    filterset_form = MetaDeviceTypeFilterForm
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE)
+    filterset = MetaTypeFilterSet
+    filterset_form = MetaTypeFilterForm
     table = MetaTypeTable
     actions = ()
     action_buttons = ()
-    template_name = 'netbox_devicetype_importer/metadevicetype_list.html'
+    template_name = 'netbox_metatype_importer/metadevicetype_list.html'
 
 
 class MetaModuleTypeListView(generic.ObjectListView):
-    queryset = MetaDeviceType.objects.filter(type=TypeChoices.TYPE_MODULE)
-    filterset = MetaDeviceTypeFilterSet
-    filterset_form = MetaDeviceTypeFilterForm
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
+    filterset = MetaTypeFilterSet
+    filterset_form = MetaTypeFilterForm
     table = MetaTypeTable
     actions = ()
     action_buttons = ()
-    template_name = 'netbox_devicetype_importer/metamoduletype_list.html'
+    template_name = 'netbox_metatype_importer/metamoduletype_list.html'
 
 
 class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin, View):
     path = None
 
     def get_required_permission(self):
-        return 'netbox_devicetype_importer.add_metadevicetype'
+        return 'netbox_metatype_importer.add_Metatype'
 
     def post(self, request):
         loaded = 0
@@ -56,9 +56,9 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
         updated = 0
         return_url = self.get_return_url(request)
 
-        if not request.user.has_perm('netbox_devicetype_importer.add_metadevicetype'):
+        if not request.user.has_perm('netbox_metatype_importer.add_Metatype'):
             return HttpResponseForbidden()
-        plugin_settings = settings.PLUGINS_CONFIG.get('netbox_devicetype_importer', {})
+        plugin_settings = settings.PLUGINS_CONFIG.get('netbox_metatype_importer', {})
         token = plugin_settings.get('github_token')
         repo = plugin_settings.get('repo')
         branch = plugin_settings.get('branch')
@@ -68,13 +68,13 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
             models = gh_api.get_tree()
         except GQLError as e:
             messages.error(request, message=f'GraphQL API Error: {e.message}')
-            return redirect('plugins:netbox_devicetype_importer:metadevicetype_list')
+            return redirect('plugins:netbox_metatype_importer:metadevicetype_list')
 
         for vendor, models in models.items():
             for model, model_data in models.items():
                 loaded += 1
                 try:
-                    metadevietype = MetaDeviceType.objects.get(vendor=vendor, name=model, type=self.path)
+                    metadevietype = MetaType.objects.get(vendor=vendor, name=model, type=self.path)
                     if metadevietype.sha != model_data['sha']:
                         metadevietype.is_new = True
                         # catch save exception
@@ -86,7 +86,7 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
                     continue
                 except ObjectDoesNotExist:
                     # its new
-                    MetaDeviceType.objects.create(
+                    MetaType.objects.create(
                         vendor=vendor,
                         name=model,
                         sha=model_data['sha'],
@@ -106,8 +106,8 @@ class MetaModuleTypeLoadView(GenericTypeLoadView):
 
 
 class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixin, View):
-    filterset = MetaDeviceTypeFilterSet
-    filterset_form = MetaDeviceTypeFilterForm
+    filterset = MetaTypeFilterSet
+    filterset_form = MetaTypeFilterForm
     type = None
     type_model = None
     model_form = None
@@ -125,7 +125,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
     ))
 
     def get_required_permission(self):
-        return 'netbox_devicetype_importer.add_metadevicetype'
+        return 'netbox_metatype_importer.add_Metatype'
 
     def post(self, request):
         return_url = self.get_return_url(request)
@@ -143,7 +143,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
         else:
             pk_list = [int(pk) for pk in request.POST.getlist('pk')]
 
-        plugin_settings = settings.PLUGINS_CONFIG.get('netbox_devicetype_importer', {})
+        plugin_settings = settings.PLUGINS_CONFIG.get('netbox_metatype_importer', {})
         token = plugin_settings.get('github_token')
         repo = plugin_settings.get('repo')
         branch = plugin_settings.get('branch')
@@ -173,7 +173,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                     _mdt.save()
         vendors_for_cre = set(model.objects.filter(pk__in=pk_list).values_list('vendor', flat=True))
         for vendor, name, sha in model.objects.filter(pk__in=pk_list, is_imported=False).values_list(
-            'vendor', 'name', 'sha'
+                'vendor', 'name', 'sha'
         ):
             query_data[sha] = f'{vendor}/{name}'
         if not query_data:
@@ -237,7 +237,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                     errored += 1
                 else:
                     imported_dt.append(obj.pk)
-                    metadt = MetaDeviceType.objects.get(sha=sha)
+                    metadt = MetaType.objects.get(sha=sha)
                     metadt.imported_dt = obj.pk
                     metadt.save()
             else:
@@ -256,7 +256,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
 
 
 class MetaDeviceTypeImportView(GenericTypeImportView):
-    queryset = MetaDeviceType.objects.filter(type=TypeChoices.TYPE_DEVICE)
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE)
     type = TypeChoices.TYPE_DEVICE
     type_model = DeviceType
     model_form = forms.DeviceTypeImportForm
@@ -264,7 +264,7 @@ class MetaDeviceTypeImportView(GenericTypeImportView):
 
 
 class MetaModuleTypeImportView(GenericTypeImportView):
-    queryset = MetaDeviceType.objects.filter(type=TypeChoices.TYPE_MODULE)
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
     type = TypeChoices.TYPE_MODULE
     type_model = ModuleType
     model_form = forms.ModuleTypeImportForm
