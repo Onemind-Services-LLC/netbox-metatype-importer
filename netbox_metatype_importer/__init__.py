@@ -7,7 +7,7 @@ class NetBoxMetatypeImporterConfig(PluginConfig):
     verbose_name = 'MetaType Importer'
     description = 'Import MetaType from github repo'
     version = __version__
-    author = 'Nikolay Yuzefovich'
+    author = 'Abhimanyu Saharan'
     author_email = 'mgk.kolek@gmail.com'
     required_settings = []
     min_version = '3.4.1'
