@@ -21,4 +21,4 @@ class NetBoxMetatypeImporterConfig(PluginConfig):
     }
 
 
-config = NetboxmetatypeimporterConfig
+config = NetBoxMetatypeImporterConfig
