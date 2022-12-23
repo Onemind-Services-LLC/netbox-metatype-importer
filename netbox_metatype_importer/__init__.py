@@ -14,7 +14,7 @@ class NetBoxMetatypeImporterConfig(PluginConfig):
     max_version = '3.4.99'
     default_settings = {
         'repo_owner': 'netbox-community',
-        'repo': 'metatype-library',
+        'repo': 'devicetype-library',
         'branch': 'master',
         'github_token': '',
         'use_gql': True,
