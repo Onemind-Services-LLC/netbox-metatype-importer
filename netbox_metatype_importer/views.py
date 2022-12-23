@@ -56,7 +56,7 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
         updated = 0
         return_url = self.get_return_url(request)
 
-        if not request.user.has_perm('netbox_metatype_importer.add_Metatype'):
+        if not request.user.has_perm('netbox_metatype_importer.add_metatype'):
             return HttpResponseForbidden()
         plugin_settings = settings.PLUGINS_CONFIG.get('netbox_metatype_importer', {})
         token = plugin_settings.get('github_token')
