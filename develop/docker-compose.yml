@@ -17,7 +17,7 @@ services:
       - ./dev.env
     volumes:
       - ./configuration.py:/opt/netbox/netbox/netbox/configuration.py
-      - ../netbox_devicetype_importer:/source/netbox_devicetype_importer
+      - ../netbox_metatype_importer:/source/netbox_metatype_importer
     tty: true
   worker:
     build:
@@ -30,13 +30,13 @@ services:
       - ./dev.env
     volumes:
       - ./configuration.py:/opt/netbox/netbox/netbox/configuration.py
-      - ../netbox_devicetype_importer:/source/netbox_devicetype_importer
+      - ../netbox_metatype_importer:/source/netbox_metatype_importer
     tty: true
   postgres:
     image: postgres:12
     env_file: dev.env
     volumes:
-      - pgdata_netbox_devicetype_importer:/var/lib/postgresql/data
+      - pgdata_netbox_metatype_importer:/var/lib/postgresql/data
   redis:
     image: redis:5-alpine
     command:
@@ -45,4 +45,4 @@ services:
       - redis-server --appendonly yes --requirepass $$REDIS_PASSWORD  ## $$ because of docker-compose
     env_file: ./dev.env
 volumes:
-  pgdata_netbox_devicetype_importer:
+  pgdata_netbox_metatype_importer:

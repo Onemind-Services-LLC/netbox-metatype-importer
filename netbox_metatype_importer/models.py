@@ -4,7 +4,7 @@ from utilities.querysets import RestrictedQuerySet
 from .choices import TypeChoices
 
 
-class MetaDeviceType(models.Model):
+class MetaType(models.Model):
     name = models.CharField(max_length=100)
     vendor = models.CharField(max_length=50)
     type = models.CharField(max_length=20, choices=TypeChoices, default=TypeChoices.TYPE_DEVICE)
@@ -25,4 +25,4 @@ class MetaDeviceType(models.Model):
             self.is_new = False
         else:
             self.is_imported = False
-        super(MetaDeviceType, self).save(*args, **kwargs)
+        super(MetaType, self).save(*args, **kwargs)

@@ -24,9 +24,9 @@ def get_version(rel_path):
 
 
 setup(
-    name='netbox-devicetype-importer',
-    version=get_version('netbox_devicetype_importer/version.py'),
-    description='Import DeviceTypes from github repo',
+    name='netbox-metatype-importer',
+    version=get_version('netbox_metatype_importer/version.py'),
+    description='Import MetaTypes from github repo',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='https://github.com/k01ek/netbox-devicetype-importer',

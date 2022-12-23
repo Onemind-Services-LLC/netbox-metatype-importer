@@ -1,10 +1,10 @@
 import django_filters
 from django.db.models import Q
 
-from .models import MetaDeviceType
+from .models import MetaType
 
 
-class MetaDeviceTypeFilterSet(django_filters.FilterSet):
+class MetaTypeFilterSet(django_filters.FilterSet):
     q = django_filters.CharFilter(
         method='search',
         label='Search',
@@ -21,7 +21,7 @@ class MetaDeviceTypeFilterSet(django_filters.FilterSet):
     )
 
     class Meta:
-        model = MetaDeviceType
+        model = MetaType
         fields = ['name', 'vendor']
 
     def by_model(self, queryset, name, value):

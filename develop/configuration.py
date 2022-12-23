@@ -151,7 +151,7 @@ NAPALM_ARGS = {
 PAGINATE_COUNT = os.environ.get("PAGINATE_COUNT", 50)
 
 # Enable installed plugins. Add the name of each plugin to the list.
-PLUGINS = ["netbox_devicetype_importer"]
+PLUGINS = ["netbox_metatype_importer"]
 
 # Plugins configuration settings. These settings are used by various plugins that the user may have installed.
 # Each key in the dictionary is the name of an installed plugin and its value is a dictionary of settings.

@@ -1,7 +1,7 @@
 """
 from rest_framework.serializers import ModelSerializer
 
-from netbox_devicetype_importer.models import MyModel1
+from netbox_metatype_importer.models import MyModel1
 
 
 class MyModel1Serializer(ModelSerializer):
