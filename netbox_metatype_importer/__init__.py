@@ -1,16 +1,18 @@
 from extras.plugins import PluginConfig
-from .version import __version__
+
+from importlib.metadata import metadata
+
+metadata = metadata('netbox_metatype_importer')
 
 
 class NetBoxMetatypeImporterConfig(PluginConfig):
-    name = 'netbox_metatype_importer'
-    verbose_name = 'MetaType Importer'
-    description = 'Import MetaType from github repo'
-    version = __version__
-    author = 'Abhimanyu Saharan'
-    author_email = 'asaharan@onemindservices.com'
-    required_settings = []
-    min_version = '3.4.1'
+    name = metadata.get('Name').replace('-', '_')
+    verbose_name = metadata.get('Summary')
+    description = metadata.get('Long-Description')
+    version = metadata.get('Version')
+    author = metadata.get('Author')
+    author_email = metadata.get('Author-email')
+    min_version = '3.4.0'
     max_version = '3.4.99'
     default_settings = {
         'repo_owner': 'netbox-community',
