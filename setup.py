@@ -13,25 +13,17 @@ def read(rel_path):
     with codecs.open(os.path.join(here, rel_path), 'r') as fp:
         return fp.read()
 
-
-def get_version(rel_path):
-    for line in read(rel_path).splitlines():
-        if line.startswith('__version__'):
-            delim = '"' if '"' in line else "'"
-            return line.split(delim)[1]
-    else:
-        raise RuntimeError("Unable to find version string.")
-
-
 setup(
     name='netbox-metatype-importer',
-    version=get_version('netbox_metatype_importer/version.py'),
+    version='0.0.1',
     description='Import MetaTypes from github repo',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='https://github.com/k01ek/netbox-devicetype-importer',
-    author='Nikolay Yuzefovich',
-    author_email='mgk.kolek@gmail.com',
+    url='https://github.com/k01ek/netbox-metatype-importer',
+    author='Abhimanyu Saharan',
+    author_email='asaharan@onemindservices.com',
+    maintainer='Prince Kumar',
+    maintainer_email='pkumar@onemindservices.com',
     install_requires=[],
     packages=find_packages(),
     include_package_data=True,
