@@ -30,7 +30,6 @@ class MetaDeviceTypeListView(generic.ObjectListView):
     filterset_form = MetaTypeFilterForm
     table = MetaTypeTable
     actions = ()
-    action_buttons = ()
     template_name = 'netbox_metatype_importer/metadevicetype_list.html'
 
 
@@ -40,7 +39,6 @@ class MetaModuleTypeListView(generic.ObjectListView):
     filterset_form = MetaTypeFilterForm
     table = MetaTypeTable
     actions = ()
-    action_buttons = ()
     template_name = 'netbox_metatype_importer/metamoduletype_list.html'
 
 
@@ -150,16 +148,14 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
         owner = plugin_settings.get('repo_owner')
         version_minor = settings.VERSION.split('.')[1]
 
-        # for 3.2 new devicetype components
-        if version_minor == '2':
-            self.related_object_forms.popitem()
-            self.related_object_forms.update(
-                {
-                    'module-bays': forms.ModuleBayTemplateImportForm,
-                    'device-bays': forms.DeviceBayTemplateImportForm,
-                    'inventory-items': forms.InventoryItemTemplateImportForm
-                }
-            )
+        self.related_object_forms.popitem()
+        self.related_object_forms.update(
+            {
+                'module-bays': forms.ModuleBayTemplateImportForm,
+                'device-bays': forms.DeviceBayTemplateImportForm,
+                'inventory-items': forms.InventoryItemTemplateImportForm
+            }
+        )
 
         gh_api = GitHubGqlAPI(token=token, owner=owner, repo=repo, branch=branch, path=self.type)
 

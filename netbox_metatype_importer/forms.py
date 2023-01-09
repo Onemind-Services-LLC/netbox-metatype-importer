@@ -7,13 +7,9 @@ from .models import MetaType
 class MetaTypeFilterForm(BootstrapMixin, forms.Form):
     q = forms.CharField(
         required=False,
-        label='Search'
+        label='Name'
     )
 
-    name = forms.CharField(
-        required=False,
-        label='Model'
-    )
     vendor = forms.CharField(
         required=False,
         label='Vendor'
@@ -21,4 +17,4 @@ class MetaTypeFilterForm(BootstrapMixin, forms.Form):
 
     class Meta:
         model = MetaType
-        fields = ['q', 'name', 'vendor']
+        fields = ['q', 'vendor']

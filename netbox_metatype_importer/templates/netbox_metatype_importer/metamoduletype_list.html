@@ -1,6 +1,6 @@
 {% extends 'generic/object_list.html' %}
 
-{% block title %}Meta Module Types{% endblock %}
+{% block title %}ModuleType Imports{% endblock %}
 
 {% block extra_controls %}
     <div class="pull-right noprint">
@@ -9,7 +9,7 @@
                 {% csrf_token %}
                 <button type="submit" name="_load"
                         formaction="{% url 'plugins:netbox_metatype_importer:metamoduletype_load' %}?return_url={% url 'plugins:netbox_metatype_importer:metamoduletype_list' %}"
-                        class="btn btn-success">
+                        class="btn btn-primary btn-sm">
                     <span class="mdi mdi-download" aria-hidden="true"></span> Load
                 </button>
             </form>

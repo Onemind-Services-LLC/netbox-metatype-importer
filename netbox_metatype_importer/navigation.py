@@ -3,7 +3,7 @@ from extras.plugins import PluginMenuItem
 menu_items = (
     PluginMenuItem(
         link='plugins:netbox_metatype_importer:metadevicetype_list',
-        link_text='MetaType Import',
+        link_text='DeviceType Import',
         permissions=['netbox_metatype_importer.view_metadevicetype'],
     ),
     PluginMenuItem(

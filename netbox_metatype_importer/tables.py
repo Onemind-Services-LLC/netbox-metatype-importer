@@ -1,21 +1,17 @@
-# for 3.2 support
-try:
-    from utilities.tables import BaseTable, ToggleColumn
-except ImportError:
-    from netbox.tables import BaseTable
-    from netbox.tables.columns import ToggleColumn
-
+from netbox.tables import NetBoxTable, columns
 from .models import MetaType
 
 
-class MetaTypeTable(BaseTable):
-    pk = ToggleColumn(visible=True)
+class MetaTypeTable(NetBoxTable):
+    pk = columns.ToggleColumn(visible=True)
     id = None
+
+    actions = columns.ActionsColumn(actions=())
 
     def render_name(self, value):
         return '{}'.format(value.split('.')[0])
 
-    class Meta(BaseTable.Meta):
+    class Meta(NetBoxTable.Meta):
         model = MetaType
         fields = ('pk', 'name', 'vendor', 'is_new', 'is_imported')
         default_columns = ('pk', 'name', 'vendor', 'is_imported')
