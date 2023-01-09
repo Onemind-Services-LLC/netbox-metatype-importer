@@ -1,4 +1,4 @@
-ARG NETBOX_VARIANT=v3.3
+ARG NETBOX_VARIANT=v3.4
 
 FROM registry.tangience.net/netbox/netbox:${NETBOX_VARIANT}
 
