@@ -17,7 +17,7 @@ class MetaType(models.Model):
     objects = RestrictedQuerySet.as_manager()
 
     def __str__(self):
-        return self.name.split('.')[0]
+        return str(self.name).split('.')[0]
 
     def save(self, *args, **kwargs):
         if self.imported_dt:
