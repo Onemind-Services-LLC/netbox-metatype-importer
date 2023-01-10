@@ -3,7 +3,7 @@ name: "🐞 Bug Report"
 about: "Report an issue to help the project improve."
 title: "[Bug] "
 labels: "type: bug"
-assignees: "abhi1693"
+assignees: "kprince28"
 
 ---
 
@@ -57,9 +57,8 @@ assignees: "abhi1693"
 <!-- use all the applicable bulleted list element for this specific issue,
 and remove all the bulleted list elements that are not relevant for this issue. -->
 
-* Node version:
-* Npm version:
-* Browser name and version:
+* NetBox version:
+* Plugin version:
 
 ---
 
