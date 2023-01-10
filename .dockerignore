@@ -179,11 +179,10 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-#.env
+.env
 .venv
-#env/
 venv/
-#ENV/
+ENV/
 env.bak/
 venv.bak/
 
@@ -211,3 +210,5 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+**/__pycache__/
+/netbox_metatype_importer.egg-info
