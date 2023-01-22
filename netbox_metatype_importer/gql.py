@@ -24,18 +24,11 @@ class GitHubGqlAPI:
           name
           type
           object {
-            ... on Blob {
-              oid
-            }
             ... on Tree {
               entries {
                 name
                 type
-                object {
-                  ... on Blob {
-                    oid
-                  }
-                }
+                oid
               }
             }
           }
@@ -94,7 +87,7 @@ class GitHubGqlAPI:
         for vendor in data['data']['repository']['object']['entries']:
             result[vendor['name']] = {}
             for model in vendor['object'].get('entries', []):
-                result[vendor['name']].update({model['name']: {'sha': model['object']['oid']}})
+                result[vendor['name']].update({model['name']: {'sha': model['oid']}})
         return result
 
     def get_files(self, query_data):
