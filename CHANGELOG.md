@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.0.2](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.0.2) (2023-01-22)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.1...v0.0.2)
+
+**Merged pull requests:**
+
+- Fixed code for upstream YAML changes and optimized GraphQL queries [\#4](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/4) ([abhi1693](https://github.com/abhi1693))
+
 ## [v0.0.1](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.0.1) (2023-01-10)
 
 [Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/2254bf2b26ca98b6345fed82460ce8055b29dc48...v0.0.1)
