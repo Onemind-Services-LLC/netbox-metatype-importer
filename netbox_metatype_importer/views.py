@@ -14,7 +14,7 @@ from dcim import forms
 from dcim.models import DeviceType, Manufacturer, ModuleType
 from netbox.views import generic
 from utilities.exceptions import AbortTransaction, PermissionsViolation
-from utilities.forms import ImportForm, restrict_form_fields
+from utilities.forms import ImportForm
 from utilities.views import ContentTypePermissionRequiredMixin, GetReturnURLMixin
 from .choices import TypeChoices
 from .filters import MetaTypeFilterSet
@@ -146,7 +146,6 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
         repo = plugin_settings.get('repo')
         branch = plugin_settings.get('branch')
         owner = plugin_settings.get('repo_owner')
-        version_minor = settings.VERSION.split('.')[1]
 
         self.related_object_forms.popitem()
         self.related_object_forms.update(
@@ -166,8 +165,9 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
             for _mdt in already_imported_mdt:
                 if self.type_model.objects.filter(pk=_mdt.imported_dt).exists() is False:
                     _mdt.imported_dt = None
+                    _mdt.is_imported = False
                     _mdt.save()
-        vendors_for_cre = set(model.objects.filter(pk__in=pk_list).values_list('vendor', flat=True))
+        vendors_for_cre = set(model.objects.filter(pk__in=pk_list).values_list('vendor', flat=True).distinct())
         for vendor, name, sha in model.objects.filter(pk__in=pk_list, is_imported=False).values_list(
                 'vendor', 'name', 'sha'
         ):
@@ -180,9 +180,10 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
         except GQLError as e:
             messages.error(request, message=f'GraphQL API Error: {e.message}')
             return redirect(return_url)
-        # cre manufacturers
+
+        # create manufacturer
         for vendor in vendors_for_cre:
-            manu, created = Manufacturer.objects.get_or_create(name=vendor, slug=slugify(vendor))
+            manufacturer, created = Manufacturer.objects.get_or_create(name=vendor, slug=slugify(vendor))
             if created:
                 vendor_count += 1
 
@@ -190,9 +191,11 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
             form = ImportForm(data={'data': yaml_text, 'format': 'yaml'})
             if form.is_valid():
                 data = form.cleaned_data['data']
+
+                if isinstance(data, list):
+                    data = data[0]
+
                 model_form = self.model_form(data)
-                # is it necessary?
-                restrict_form_fields(model_form, request.user)
 
                 for field_name, field in model_form.fields.items():
                     if field_name not in data and hasattr(field, 'initial'):
@@ -206,11 +209,8 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                             for field_name, related_object_form in self.related_object_forms.items():
                                 related_obj_pks = []
                                 for i, rel_obj_data in enumerate(data.get(field_name, list())):
-                                    if version_minor in ['2', '3']:
-                                        rel_obj_data.update({self.related_object: obj})
-                                        f = related_object_form(rel_obj_data)
-                                    else:
-                                        f = related_object_form(obj, rel_obj_data)
+                                    rel_obj_data.update({self.related_object: obj})
+                                    f = related_object_form(rel_obj_data)
                                     for subfield_name, field in f.fields.items():
                                         if subfield_name not in rel_obj_data and hasattr(field, 'initial'):
                                             f.data[subfield_name] = field.initial
