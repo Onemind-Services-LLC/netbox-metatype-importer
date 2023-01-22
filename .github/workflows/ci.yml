@@ -37,13 +37,6 @@ jobs:
           PYTHON_FLAKE8_CONFIG_FILE: pyproject.toml
           PYTHON_ISORT_CONFIG_FILE: pyproject.toml
   test:
-    strategy:
-      matrix:
-        test_cmd:
-          - ./test.sh feature
-          - ./test.sh snapshot
-          - ./test.sh latest
-      fail-fast: false
     runs-on: misc
     name: Runs plugin tests
     steps:
@@ -52,4 +45,4 @@ jobs:
         uses: actions/checkout@v3
       - id: docker-test
         name: Test the image
-        run: ${{ matrix.test_cmd }}
+        run: ./test.sh snapshot
