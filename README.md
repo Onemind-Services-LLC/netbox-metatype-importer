@@ -1,8 +1,8 @@
 # Netbox DeviceType Import Plugin
-[NetBox](https://github.com/netbox-community/netbox) plugin for easy import DeviceType from [NetBox Device Type Library](https://github.com/netbox-community/devicetype-library)
+[NetBox](https://github.com/netbox-community/netbox) plugin for easy import DeviceType and ModuleType from [NetBox Device Type Library](https://github.com/netbox-community/devicetype-library). This is the continuation of the [Netbox DeviceType Import Plugin](https://github.com/k01ek/netbox-devicetype-importer) app.
 
 ## Description
-The plugin uses [GitHub GraphQL API](https://docs.github.com/en/graphql) to load DeviceType from [NetBox Device Type Library](https://github.com/netbox-community/devicetype-library). The plugin loads only file tree representation from GitHub repo and shows it as a table with vendor and model columns. DeviceType definitions files are loaded when you try to import selected models.
+The plugin uses [GitHub GraphQL API](https://docs.github.com/en/graphql) to load DeviceType and ModuleType from [NetBox Device Type Library](https://github.com/netbox-community/devicetype-library). The plugin loads only file tree representation from GitHub repo and shows it as a table with vendor and model columns. DeviceType definitions files are loaded when you try to import selected models.
 To use GraphQL API you need to set GitHub personal access token in plugin settings. How to create the token, see ["Creating a personal access token."](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token)
 
 ## Compatibility
