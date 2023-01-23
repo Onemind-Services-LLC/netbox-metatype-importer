@@ -2,10 +2,19 @@
 
 ## [Unreleased](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/HEAD)
 
-[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.2...HEAD)
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.3...HEAD)
+
+**Closed issues:**
+
+- \[Docs\]: Update README to document all configuration options [\#7](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/7)
+
+## [v0.0.3](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.0.3) (2023-01-23)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.2...v0.0.3)
 
 **Merged pull requests:**
 
+- Updated Documentation [\#8](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/8) ([abhi1693](https://github.com/abhi1693))
 - Prepare for public release [\#5](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/5) ([abhi1693](https://github.com/abhi1693))
 
 ## [v0.0.2](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.0.2) (2023-01-22)
