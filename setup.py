@@ -6,7 +6,7 @@ setup(
     description='Import Metatypes',
     long_description='Import MetaTypes into NetBox',
     long_description_content_type="text/markdown",
-    url='https://github.com/k01ek/netbox-metatype-importer',
+    url='https://github.com/Onemind-Services-LLC/netbox-metatype-importer',
     author='Abhimanyu Saharan',
     author_email='asaharan@onemindservices.com',
     maintainer='Prince Kumar',
