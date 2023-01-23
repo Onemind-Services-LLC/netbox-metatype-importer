@@ -7,7 +7,6 @@
 from os import environ
 from os.path import abspath, dirname
 
-
 # For reference see https://netbox.readthedocs.io/en/stable/configuration/
 # Based on https://github.com/netbox-community/netbox/blob/master/netbox/netbox/configuration.example.py
 
@@ -68,13 +67,15 @@ REDIS = {
     'caching': {
         'HOST': environ.get('REDIS_CACHE_HOST', environ.get('REDIS_HOST', 'localhost')),
         'PORT': int(environ.get('REDIS_CACHE_PORT', environ.get('REDIS_PORT', 6379))),
-        'PASSWORD': _read_secret('redis_cache_password',
-                                 environ.get('REDIS_CACHE_PASSWORD', environ.get('REDIS_PASSWORD', ''))),
+        'PASSWORD': _read_secret(
+            'redis_cache_password', environ.get('REDIS_CACHE_PASSWORD', environ.get('REDIS_PASSWORD', ''))
+        ),
         'DATABASE': int(environ.get('REDIS_CACHE_DATABASE', 1)),
         'SSL': environ.get('REDIS_CACHE_SSL', environ.get('REDIS_SSL', 'False')).lower() == 'true',
-        'INSECURE_SKIP_TLS_VERIFY': environ.get('REDIS_CACHE_INSECURE_SKIP_TLS_VERIFY',
-                                                environ.get('REDIS_INSECURE_SKIP_TLS_VERIFY',
-                                                            'False')).lower() == 'true',
+        'INSECURE_SKIP_TLS_VERIFY': environ.get(
+            'REDIS_CACHE_INSECURE_SKIP_TLS_VERIFY', environ.get('REDIS_INSECURE_SKIP_TLS_VERIFY', 'False')
+        ).lower()
+        == 'true',
     },
 }
 
