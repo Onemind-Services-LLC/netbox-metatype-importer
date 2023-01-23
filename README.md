@@ -32,7 +32,6 @@ The following options are available in the configuration file:
 - `github_token`
   - __Type__: `String`
   - __Description__: GitHub personal access token
-  - __Default__: `None`
 - `repo`
   - __Type__: `String`
   - __Description__: Name of the NetBox Device Type Library repo
