@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/HEAD)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.2...HEAD)
+
+**Merged pull requests:**
+
+- Prepare for public release [\#5](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/5) ([abhi1693](https://github.com/abhi1693))
+
 ## [v0.0.2](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.0.2) (2023-01-22)
 
 [Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.1...v0.0.2)

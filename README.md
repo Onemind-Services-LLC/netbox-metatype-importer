@@ -5,32 +5,38 @@
 The plugin uses [GitHub GraphQL API](https://docs.github.com/en/graphql) to load DeviceType and ModuleType from [NetBox Device Type Library](https://github.com/netbox-community/devicetype-library). The plugin loads only file tree representation from GitHub repo and shows it as a table with vendor and model columns. DeviceType definitions files are loaded when you try to import selected models.
 To use GraphQL API you need to set GitHub personal access token in plugin settings. How to create the token, see ["Creating a personal access token."](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token)
 
-## Compatibility
+# Compatibility
 
-This plugin in compatible with [NetBox](https://netbox.readthedocs.org/) 3.4 and later
+|  NetBox Version  | Plugin Version |
+|:----------------:|:--------------:|
+|      3.4.x       |     0.0.x      |
 
-## Installation
+# Installation
 
-The plugin is available as a Python package in pypi and can be installed with pip
-
-```
-pip install git+https://github.com/Onemind-Services-LLC/netbox-metatype-importer.git
-```
-Enable the plugin in [NetBox Configuration](https://netbox.readthedocs.io/en/stable/configuration/)
-```
-PLUGINS = ['netbox_metatype_importer']
-```
+* Install NetBox as per NetBox documentation
+* Add to local_requirements.txt:
+  * `netbox-metatype-importer`
+* Install requirements: `./venv/bin/pip install -r local_requirements.txt`
+* Add to PLUGINS in NetBox configuration:
+  * `'netbox_metatype_importer',`
+* Run migration: `./venv/bin/python netbox/manage.py migrate`
 
 ## Configuration
-Put your GitHub personal access token to [NetBox plugins config](https://netbox.readthedocs.io/en/stable/configuration/optional-settings/#plugins_config)
-```
-PLUGINS_CONFIG = {
-    'netbox_metatype_importer': {
-        'github_token': '<YOUR-GITHUB-TOKEN>'
-    }
-}
-```
 
-## Future 
-* Import device images from GitHub repo
+The following options are available in the configuration file:
 
+- `branch`
+  - __Type__: `String`
+  - __Description__: Branch of the NetBox Device Type Library repo
+  - __Default__: `master`
+- `github_token`
+  - __Type__: `String`
+  - __Description__: GitHub personal access token
+- `repo`
+  - __Type__: `String`
+  - __Description__: Name of the NetBox Device Type Library repo
+  - __Default__: `devicetype-library`
+- `repo_owner`
+  - __Type__: `String`
+  - __Description__: Owner of the NetBox Device Type Library repo
+  - __Default__: `netbox-community`

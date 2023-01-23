@@ -18,9 +18,9 @@ class NetBoxMetatypeImporterConfig(PluginConfig):
         'repo_owner': 'netbox-community',
         'repo': 'devicetype-library',
         'branch': 'master',
-        'github_token': '',
-        'use_gql': True,
+        'github_token': ''
     }
+    required_settings = ['github_token']
 
 
 config = NetBoxMetatypeImporterConfig
