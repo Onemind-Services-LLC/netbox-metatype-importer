@@ -2,6 +2,8 @@ from django.urls import path
 
 from . import views
 
+app_name = 'netbox_metatype_importer'
+
 urlpatterns = [
     # Device types
     path('meta-device-types/', views.MetaDeviceTypeListView.as_view(), name='metadevicetype_list'),
