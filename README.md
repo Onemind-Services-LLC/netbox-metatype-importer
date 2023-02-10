@@ -1,4 +1,4 @@
-# Netbox DeviceType Import Plugin
+# Netbox DeviceType/ModuleType Import Plugin
 [NetBox](https://github.com/netbox-community/netbox) plugin for easy import DeviceType and ModuleType from [NetBox Device Type Library](https://github.com/netbox-community/devicetype-library). This is the continuation of the [Netbox DeviceType Import Plugin](https://github.com/k01ek/netbox-devicetype-importer) app.
 
 ## Description
