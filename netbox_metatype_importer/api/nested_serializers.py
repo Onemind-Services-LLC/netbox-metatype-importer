@@ -9,10 +9,12 @@ __all__ = [
 
 
 class NestedMetaTypeSerializer(WritableNestedSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_metatype_importer-api:metatype-detail'
+    url = serializers.HyperlinkedRelatedField(
+        view_name='metatype-detail',
+        lookup_field='name',
+        read_only=True
     )
 
     class Meta:
         model = MetaType
-        fields = '__all__'
+        fields = ('display', 'id', 'name', 'url')

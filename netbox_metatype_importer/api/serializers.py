@@ -9,8 +9,10 @@ __all__ = [
 
 
 class MetaTypeSerializer(NetBoxModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='plugins-api:netbox_metatype_importer-api:metatype-detail'
+    url = serializers.HyperlinkedRelatedField(
+        view_name='metatype-detail',
+        lookup_field='name',
+        read_only=True
     )
 
     class Meta:
