@@ -2,11 +2,24 @@
 
 ## [Unreleased](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/HEAD)
 
-[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.3...HEAD)
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.4...HEAD)
+
+**Closed issues:**
+
+- \[Bug\]: Application labels aren't unique, duplicates: netbox\_metatype\_importer [\#13](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/13)
+- \[Bug\]: urlpattern not define  [\#10](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/10)
+
+## [v0.0.4](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.0.4) (2023-02-04)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.3...v0.0.4)
 
 **Closed issues:**
 
 - \[Docs\]: Update README to document all configuration options [\#7](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/7)
+
+**Merged pull requests:**
+
+- Fixed issues with missing urlpatterns [\#12](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/12) ([abhi1693](https://github.com/abhi1693))
 
 ## [v0.0.3](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.0.3) (2023-01-23)
 
