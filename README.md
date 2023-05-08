@@ -7,9 +7,10 @@ To use GraphQL API you need to set GitHub personal access token in plugin settin
 
 ## Compatibility
 
-|  NetBox Version  | Plugin Version |
-|:----------------:|:--------------:|
-|      3.4.x       |     0.0.x      |
+| NetBox Version | Plugin Version |
+|:--------------:|:--------------:|
+|     3.4.x      |     0.0.x      |
+|     3.5.x      |     0.1.x      |
 
 ## Installation
 
