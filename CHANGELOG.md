@@ -6,6 +6,7 @@
 
 **Closed issues:**
 
+- I have tried to install the module in the new version of netbox and I realized that it is not compatible, could you please help me. [\#18](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/18)
 - \[Bug\]: Application labels aren't unique, duplicates: netbox\_metatype\_importer [\#13](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/13)
 - \[Bug\]: urlpattern not define  [\#10](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/10)
 
