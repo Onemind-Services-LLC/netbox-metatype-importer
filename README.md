@@ -5,13 +5,14 @@
 The plugin uses [GitHub GraphQL API](https://docs.github.com/en/graphql) to load DeviceType and ModuleType from [NetBox Device Type Library](https://github.com/netbox-community/devicetype-library). The plugin loads only file tree representation from GitHub repo and shows it as a table with vendor and model columns. DeviceType definitions files are loaded when you try to import selected models.
 To use GraphQL API you need to set GitHub personal access token in plugin settings. How to create the token, see ["Creating a personal access token."](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token)
 
-# Compatibility
+## Compatibility
 
-|  NetBox Version  | Plugin Version |
-|:----------------:|:--------------:|
-|      3.4.x       |     0.0.x      |
+| NetBox Version | Plugin Version |
+|:--------------:|:--------------:|
+|     3.4.x      |     0.0.x      |
+|     3.5.x      |     0.1.x      |
 
-# Installation
+## Installation
 
 * Install NetBox as per NetBox documentation
 * Add to local_requirements.txt:
