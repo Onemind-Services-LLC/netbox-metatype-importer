@@ -84,6 +84,12 @@ class GitHubGqlAPI:
         data = self.get_query(query)
         if not data:
             return result
+
+        try:
+            data['data']['repository']['object']['entries']
+        except TypeError:
+            return None
+
         for vendor in data['data']['repository']['object']['entries']:
             result[vendor['name']] = {}
             for model in vendor['object'].get('entries', []):
