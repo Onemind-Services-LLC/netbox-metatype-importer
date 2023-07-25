@@ -68,6 +68,10 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
             messages.error(request, message=f'GraphQL API Error: {e.message}')
             return redirect('plugins:netbox_metatype_importer:metadevicetype_list')
 
+        if models is None:
+            messages.error(request, 'Check your plugin settings and try again')
+            models = {}
+
         for vendor, models in models.items():
             for model, model_data in models.items():
                 loaded += 1
@@ -91,7 +95,8 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
                         type=self.path
                     )
                     created += 1
-        messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
+        if models:
+            messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
         return redirect(return_url)
 
 
@@ -265,3 +270,13 @@ class MetaModuleTypeImportView(GenericTypeImportView):
     type_model = ModuleType
     model_form = forms.ModuleTypeImportForm
     related_object = 'module_type'
+
+
+class MetaDeviceTypeBulkDeleteView(generic.BulkDeleteView):
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE)
+    table = MetaTypeTable
+
+
+class MetaModuleTypeBulkDeleteView(generic.BulkDeleteView):
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
+    table = MetaTypeTable
