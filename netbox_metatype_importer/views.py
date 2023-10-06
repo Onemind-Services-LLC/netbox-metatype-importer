@@ -14,7 +14,7 @@ from dcim import forms
 from dcim.models import DeviceType, Manufacturer, ModuleType
 from netbox.views import generic
 from utilities.exceptions import AbortTransaction, PermissionsViolation
-from utilities.forms import ImportForm
+from utilities.forms.bulk_import import BulkImportForm
 from utilities.views import ContentTypePermissionRequiredMixin, GetReturnURLMixin
 from .choices import TypeChoices
 from .filters import MetaTypeFilterSet
@@ -193,7 +193,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                 vendor_count += 1
 
         for sha, yaml_text in dt_files.items():
-            form = ImportForm(data={'data': yaml_text, 'format': 'yaml'})
+            form = BulkImportForm(data={'data': yaml_text, 'format': 'yaml'})
             if form.is_valid():
                 data = form.cleaned_data['data']
 
