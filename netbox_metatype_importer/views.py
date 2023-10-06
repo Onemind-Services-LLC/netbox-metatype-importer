@@ -202,10 +202,6 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
 
                 model_form = self.model_form(data)
 
-                for field_name, field in model_form.fields.items():
-                    if field_name not in data and hasattr(field, 'initial'):
-                        model_form.data[field_name] = field.initial
-
                 if model_form.is_valid():
                     try:
                         with transaction.atomic():
@@ -250,9 +246,9 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                 messages.error(request, f'Failed: {errored}')
             qparams = urlencode({'id': imported_dt}, doseq=True)
             # Black magic to get the url path from the type
-            return redirect(reverse(f'dcim:{str(self.type).replace("-", "").rstrip("s")}_list') + '?' + qparams)
+            return redirect(reverse(f'dcim:{self.type_model._meta.model_name}_list') + '?' + qparams)
         else:
-            messages.error(request, 'Can not import Device Types')
+            messages.error(request, f'Can not import {self.type_model.__name__}')
             return redirect(return_url)
 
 

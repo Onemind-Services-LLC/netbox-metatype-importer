@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='netbox-metatype-importer',
-    version='0.1.0',
+    version='0.1.1',
     description='Import Metatypes',
     long_description='Import MetaTypes into NetBox',
     long_description_content_type="text/markdown",
