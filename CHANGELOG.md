@@ -1,12 +1,16 @@
 # Changelog
 
-## [Unreleased](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/HEAD)
+## [v0.1.1](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.1.1) (2024-01-04)
 
-[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.5...HEAD)
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.5...v0.1.1)
 
 **Closed issues:**
 
 - Mismatch in PluginConfig Attributes and Update descriptions in setup.py file  [\#29](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/29)
+
+**Merged pull requests:**
+
+- Release v0.1.1 [\#31](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/31) ([abhi1693](https://github.com/abhi1693))
 
 ## [v0.0.5](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.0.5) (2023-07-25)
 
