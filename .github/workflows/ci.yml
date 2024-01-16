@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Checks syntax
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4.1.1
         with:
           # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
@@ -42,7 +42,7 @@ jobs:
     steps:
       - id: git-checkout
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.1.1
       - id: docker-test
         name: Test the image
         run: ./test.sh
