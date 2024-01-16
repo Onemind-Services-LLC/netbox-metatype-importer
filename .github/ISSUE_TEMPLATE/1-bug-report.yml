@@ -1,0 +1,50 @@
+---
+name: 🐞 Bug Report
+description: Report a Reproducible Bug in the Current Release of this NetBox Plugin
+labels: [ "type: bug" ]
+assignees: "kprince28"
+body:
+  - type: markdown
+    attributes:
+      value: >
+        **Note:** This form is exclusively for reporting _reproducible bugs_ in the current NetBox plugin installation.
+
+  - type: input
+    attributes:
+      label: NetBox Version
+      description: Indicate the version of NetBox you are currently running.
+      placeholder: v3.6.9
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: NetBox Plugin Version
+      description: Please specify the version of the NetBox plugin you are currently using.
+      placeholder: v0.2.0
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: >
+        When submitting a bug report for the NetBox plugin, it's essential to provide comprehensive step-by-step instructions for reproducing the issue on a clean, empty NetBox installation. These instructions should be clear enough for someone else to follow effortlessly and must encompass the creation of any necessary objects, configuration changes, and a complete accounting of the actions being taken. Remember, the goal is to ensure that the problem can be replicated precisely using the current stable release of the NetBox plugin.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: Describe what you expected to happen.
+      placeholder: A new widget should have been created with the specified attributes.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Observed Behavior
+      description: Describe what actually happened.
+      placeholder: A TypeError exception was raised
+    validations:
+      required: true
