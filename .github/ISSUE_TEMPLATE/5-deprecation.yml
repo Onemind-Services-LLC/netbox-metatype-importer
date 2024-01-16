@@ -1,0 +1,34 @@
+---
+name: ⚠️ Deprecation Notice
+description: A deprecation notice for outdated features or behaviors
+labels: ["type: deprecated"]
+assignees: "kprince28"
+body:
+  - type: markdown
+    attributes:
+      value: >
+        **Important Note:** This template is intended to inform users and developers about the deprecation of certain features or behaviors in the project. If you have questions or need assistance with the transition, please comment on this issue.
+
+  - type: textarea
+    attributes:
+      label: Deprecated Feature or Behavior
+      description: >
+        Please specify the feature or behavior that is being deprecated. Include relevant details such as the file, function, or component name.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Deprecation Details
+      description: >
+        Provide information about why this feature or behavior is being deprecated. Explain any alternatives or recommended actions for users or developers to take.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Timeline for Deprecation
+      description: >
+        Outline the timeline for the deprecation process, including any milestones, dates, or versions when the feature or behavior will be officially deprecated and removed.
+    validations:
+      required: true

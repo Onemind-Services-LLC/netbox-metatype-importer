@@ -1,0 +1,57 @@
+---
+name: ✨ Feature Request
+description: Propose a new feature or enhancement
+labels: [ "type: feature" ]
+assignees: "kprince28"
+body:
+  - type: markdown
+    attributes:
+      value: >
+        **NOTE:** This form is exclusively for submitting well-considered proposals to expand or refine
+        NetBox Plugin's functionality. If you're grappling with a problem or still refining your feature idea,
+        please initiate a discussion instead.
+
+  - type: input
+    attributes:
+      label: Current NetBox Version
+      description: What version of NetBox are you currently running?
+      placeholder: v3.6.9
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: Feature Type
+      options:
+        - New Model for Plugin
+        - Modification to Existing Model
+        - Addition of a Function
+        - Removal of a Function
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Proposed Functionality
+      description: >
+        Provide a comprehensive description of the new feature or behavior you are suggesting. Include specific changes
+        to workflows, data models, and dependencies. The more detailed your proposal, the higher the chance it will be discussed.
+        Feature requests without a clear implementation plan may be declined.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Use Case
+      description: >
+        Explain how implementing this functionality would benefit NetBox users, particularly within this plugin's context.
+        What problem does it address?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: External Dependencies
+      description: >
+        Enumerate any new external libraries or services that this feature would necessitate.
+        For example, does it require installing a new Python package? (Not all new features introduce dependencies.)
