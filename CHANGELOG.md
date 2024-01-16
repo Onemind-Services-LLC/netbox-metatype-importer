@@ -1,14 +1,40 @@
 # Changelog
 
-## [Unreleased](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/HEAD)
+## [v0.1.1](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.1.1) (2024-01-04)
 
-[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.4...HEAD)
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.5...v0.1.1)
+
+**Closed issues:**
+
+- Mismatch in PluginConfig Attributes and Update descriptions in setup.py file  [\#29](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/29)
+
+**Merged pull requests:**
+
+- Release v0.1.1 [\#31](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/31) ([abhi1693](https://github.com/abhi1693))
+
+## [v0.0.5](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.0.5) (2023-07-25)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.1.0...v0.0.5)
+
+**Closed issues:**
+
+- \[Bug\]: python3 manage.py migrate issue [\#16](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/16)
+- \[Feature\]: Multiple select when searching for different types [\#14](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/14)
+
+## [v0.1.0](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.1.0) (2023-05-08)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.4...v0.1.0)
 
 **Closed issues:**
 
 - I have tried to install the module in the new version of netbox and I realized that it is not compatible, could you please help me. [\#18](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/18)
 - \[Bug\]: Application labels aren't unique, duplicates: netbox\_metatype\_importer [\#13](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/13)
 - \[Bug\]: urlpattern not define  [\#10](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/10)
+
+**Merged pull requests:**
+
+- PRVB [\#20](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/20) ([abhi1693](https://github.com/abhi1693))
+- Adds support for NetBox v3.5 [\#19](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/19) ([kprince28](https://github.com/kprince28))
 
 ## [v0.0.4](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.0.4) (2023-02-04)
 
