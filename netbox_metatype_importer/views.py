@@ -68,6 +68,10 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
             messages.error(request, message=f'GraphQL API Error: {e.message}')
             return redirect('plugins:netbox_metatype_importer:metadevicetype_list')
 
+        if models is None:
+            messages.error(request, 'Check your plugin settings and try again')
+            models = {}
+
         for vendor, models in models.items():
             for model, model_data in models.items():
                 loaded += 1
@@ -91,7 +95,8 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
                         type=self.path
                     )
                     created += 1
-        messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
+        if models:
+            messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
         return redirect(return_url)
 
 
@@ -197,10 +202,6 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
 
                 model_form = self.model_form(data)
 
-                for field_name, field in model_form.fields.items():
-                    if field_name not in data and hasattr(field, 'initial'):
-                        model_form.data[field_name] = field.initial
-
                 if model_form.is_valid():
                     try:
                         with transaction.atomic():
@@ -245,9 +246,9 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                 messages.error(request, f'Failed: {errored}')
             qparams = urlencode({'id': imported_dt}, doseq=True)
             # Black magic to get the url path from the type
-            return redirect(reverse(f'dcim:{str(self.type).replace("-", "").rstrip("s")}_list') + '?' + qparams)
+            return redirect(reverse(f'dcim:{self.type_model._meta.model_name}_list') + '?' + qparams)
         else:
-            messages.error(request, 'Can not import Device Types')
+            messages.error(request, f'Can not import {self.type_model.__name__}')
             return redirect(return_url)
 
 
@@ -265,3 +266,13 @@ class MetaModuleTypeImportView(GenericTypeImportView):
     type_model = ModuleType
     model_form = forms.ModuleTypeImportForm
     related_object = 'module_type'
+
+
+class MetaDeviceTypeBulkDeleteView(generic.BulkDeleteView):
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE)
+    table = MetaTypeTable
+
+
+class MetaModuleTypeBulkDeleteView(generic.BulkDeleteView):
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
+    table = MetaTypeTable

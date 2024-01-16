@@ -1,0 +1,25 @@
+---
+name: 🏡 Housekeeping
+description: A codebase enhancement (for developers' use only)
+labels: ["type: maintenance"]
+assignees: "kprince28"
+body:
+  - type: markdown
+    attributes:
+      value: >
+        **Important Note:** This template is intended for use by maintainers exclusively. Please refrain from submitting an issue using this template unless you have been specifically requested to do so.
+
+  - type: textarea
+    attributes:
+      label: Proposed Changes
+      description: >
+        Please provide a detailed description of the new feature or behavior you are proposing. Include any specific modifications to workflows, data models, or the user interface.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Justification
+      description: Please offer a rationale for the proposed changes.
+    validations:
+      required: true
