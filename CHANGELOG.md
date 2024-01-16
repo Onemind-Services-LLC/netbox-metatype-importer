@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/HEAD)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.1.1...HEAD)
+
+**Closed issues:**
+
+- \[Feature\]: Add support for NetBox v3.6 [\#26](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/26)
+
+**Merged pull requests:**
+
+- Add support for NetBox v3.6 [\#34](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/34) ([kprince28](https://github.com/kprince28))
+- Release v0.2.0 [\#33](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/33) ([kprince28](https://github.com/kprince28))
+
 ## [v0.1.1](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.1.1) (2024-01-04)
 
 [Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.5...v0.1.1)
@@ -20,6 +33,10 @@
 
 - \[Bug\]: python3 manage.py migrate issue [\#16](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/16)
 - \[Feature\]: Multiple select when searching for different types [\#14](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/14)
+
+**Merged pull requests:**
+
+- Added bulk delete and other fixes [\#24](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/24) ([abhi1693](https://github.com/abhi1693))
 
 ## [v0.1.0](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.1.0) (2023-05-08)
 
