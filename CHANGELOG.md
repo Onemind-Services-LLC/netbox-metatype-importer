@@ -1,7 +1,5 @@
 # Changelog
 
-## [v0.1.1](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.1.1) (2024-01-04)
-
 [Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.0.5...v0.1.1)
 
 **Closed issues:**
