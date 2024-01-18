@@ -88,12 +88,7 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
                     continue
                 except ObjectDoesNotExist:
                     # its new
-                    MetaType.objects.create(
-                        vendor=vendor,
-                        name=model,
-                        sha=model_data['sha'],
-                        type=self.path
-                    )
+                    MetaType.objects.create(vendor=vendor, name=model, sha=model_data['sha'], type=self.path)
                     created += 1
         if models:
             messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
@@ -116,16 +111,18 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
     model_form = None
     related_object = None
 
-    related_object_forms = OrderedDict((
-        ('console-ports', forms.ConsolePortTemplateImportForm),
-        ('console-server-ports', forms.ConsoleServerPortTemplateImportForm),
-        ('power-ports', forms.PowerPortTemplateImportForm),
-        ('power-outlets', forms.PowerOutletTemplateImportForm),
-        ('interfaces', forms.InterfaceTemplateImportForm),
-        ('rear-ports', forms.RearPortTemplateImportForm),
-        ('front-ports', forms.FrontPortTemplateImportForm),
-        ('device-bays', forms.DeviceBayTemplateImportForm),
-    ))
+    related_object_forms = OrderedDict(
+        (
+            ('console-ports', forms.ConsolePortTemplateImportForm),
+            ('console-server-ports', forms.ConsoleServerPortTemplateImportForm),
+            ('power-ports', forms.PowerPortTemplateImportForm),
+            ('power-outlets', forms.PowerOutletTemplateImportForm),
+            ('interfaces', forms.InterfaceTemplateImportForm),
+            ('rear-ports', forms.RearPortTemplateImportForm),
+            ('front-ports', forms.FrontPortTemplateImportForm),
+            ('device-bays', forms.DeviceBayTemplateImportForm),
+        )
+    )
 
     def get_required_permission(self):
         return 'netbox_metatype_importer.add_metatype'
@@ -157,7 +154,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
             {
                 'module-bays': forms.ModuleBayTemplateImportForm,
                 'device-bays': forms.DeviceBayTemplateImportForm,
-                'inventory-items': forms.InventoryItemTemplateImportForm
+                'inventory-items': forms.InventoryItemTemplateImportForm,
             }
         )
 
@@ -174,7 +171,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                     _mdt.save()
         vendors_for_cre = set(model.objects.filter(pk__in=pk_list).values_list('vendor', flat=True).distinct())
         for vendor, name, sha in model.objects.filter(pk__in=pk_list, is_imported=False).values_list(
-                'vendor', 'name', 'sha'
+            'vendor', 'name', 'sha'
         ):
             query_data[sha] = f'{vendor}/{name}'
         if not query_data:

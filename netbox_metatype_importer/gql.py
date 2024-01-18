@@ -105,7 +105,9 @@ class GitHubGqlAPI:
         if not query_data:
             return result
         template = Template(self.files_query)
-        query = template.render(owner=self.owner, repo=self.repo, branch=self.branch, data=query_data, root_path=self.path)
+        query = template.render(
+            owner=self.owner, repo=self.repo, branch=self.branch, data=query_data, root_path=self.path
+        )
         data = self.get_query(query)
         for k, v in data['data']['repository'].items():
             result[k.replace('sha_', '')] = v['text']

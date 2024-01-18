@@ -18,5 +18,5 @@ setup(
         'Development Status :: 3 - Alpha',
         'Framework :: Django',
         'Programming Language :: Python :: 3',
-    ]
+    ],
 )

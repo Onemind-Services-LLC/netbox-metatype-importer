@@ -5,15 +5,9 @@ from .models import MetaType
 
 
 class MetaTypeFilterForm(BootstrapMixin, forms.Form):
-    q = forms.CharField(
-        required=False,
-        label='Name'
-    )
+    q = forms.CharField(required=False, label='Name')
 
-    vendor = forms.CharField(
-        required=False,
-        label='Vendor'
-    )
+    vendor = forms.CharField(required=False, label='Vendor')
 
     class Meta:
         model = MetaType
