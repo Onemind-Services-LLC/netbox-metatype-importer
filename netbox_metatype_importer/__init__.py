@@ -18,7 +18,7 @@ class NetBoxMetatypeImporterConfig(PluginConfig):
         'repo_owner': 'netbox-community',
         'repo': 'devicetype-library',
         'branch': 'master',
-        'github_token': ''
+        'github_token': '',
     }
     required_settings = ['github_token']
 

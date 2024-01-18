@@ -9,7 +9,5 @@ PLUGINS = [
 ]
 
 PLUGINS_CONFIG = {  # type: ignore
-    "netbox_metatype_importer": {
-        'github_token': 'YOUR_GITHUB_TOKEN'
-    },
+    "netbox_metatype_importer": {'github_token': 'YOUR_GITHUB_TOKEN'},
 }
