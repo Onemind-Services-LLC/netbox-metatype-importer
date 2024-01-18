@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='netbox-metatype-importer',
-    version='0.2.0',
+    version='0.3.0',
     description='Easily import Device and Module types from GitHub repo',
     long_description='Import MetaTypes into NetBox',
     long_description_content_type="text/markdown",
@@ -18,5 +18,5 @@ setup(
         'Development Status :: 3 - Alpha',
         'Framework :: Django',
         'Programming Language :: Python :: 3',
-    ]
+    ],
 )

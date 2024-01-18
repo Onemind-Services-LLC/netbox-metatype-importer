@@ -25,4 +25,4 @@ class MetaType(models.Model):
             self.is_new = False
         else:
             self.is_imported = False
-        super(MetaType, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)

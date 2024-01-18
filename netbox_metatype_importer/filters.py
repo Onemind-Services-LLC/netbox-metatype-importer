@@ -45,7 +45,5 @@ class MetaTypeFilterSet(django_filters.FilterSet):
         if not value.strip():
             return queryset
 
-        qs_filter = (
-            Q(name__icontains=value) | Q(vendor__icontains=value)
-        )
+        qs_filter = Q(name__icontains=value) | Q(vendor__icontains=value)
         return queryset.filter(qs_filter)
