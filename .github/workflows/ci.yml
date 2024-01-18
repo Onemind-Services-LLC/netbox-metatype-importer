@@ -16,7 +16,7 @@ on:
 jobs:
   pre_commit:
     name: Run lint rules
-    runs-on: cypress
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
       - uses: pre-commit/action@v3.0.0
 
   test:
-    runs-on: misc
+    runs-on: ubuntu-latest
     name: Runs plugin tests
 
     steps:
