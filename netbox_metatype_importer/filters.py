@@ -24,12 +24,6 @@ class MetaTypeFilterSet(django_filters.FilterSet):
         model = MetaType
         fields = ['id', 'name', 'vendor']
 
-    def by_model(self, queryset, name, value):
-        if not value.strip():
-            return queryset
-
-        return queryset.filter(Q(name__icontains=value))
-
     def by_vendor(self, queryset, name, value):
         if not value.strip():
             return queryset
