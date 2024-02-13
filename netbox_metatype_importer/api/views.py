@@ -142,7 +142,7 @@ class MetaTypeImportViewSetBase(BaseViewSet):
 
         if name := request.data.get("name"):
             instance = MetaType.objects.filter(
-                Q(name__in=[f"{name}.yaml", f"{name}.yml"]), type=self.type
+                Q(name__in=[f"{name}.yaml", f"{name}.yml", name]), type=self.type
             ).values_list("pk", flat=True)
             pk_list = list(instance)
         else:
