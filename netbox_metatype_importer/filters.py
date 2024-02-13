@@ -1,6 +1,7 @@
 import django_filters
 from django.db.models import Q
 
+from utilities.filters import MultiValueCharFilter
 from .models import MetaType
 
 
@@ -10,9 +11,8 @@ class MetaTypeFilterSet(django_filters.FilterSet):
         label='Search',
     )
 
-    name = django_filters.CharFilter(
-        method='by_model',
-        label='Model',
+    name = MultiValueCharFilter(
+        lookup_expr='iexact'
     )
 
     vendor = django_filters.CharFilter(
@@ -22,7 +22,7 @@ class MetaTypeFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = MetaType
-        fields = ['name', 'vendor']
+        fields = ['id', 'name', 'vendor']
 
     def by_model(self, queryset, name, value):
         if not value.strip():
@@ -46,6 +46,6 @@ class MetaTypeFilterSet(django_filters.FilterSet):
             return queryset
 
         qs_filter = (
-            Q(name__icontains=value) | Q(vendor__icontains=value)
+                Q(name__icontains=value) | Q(vendor__icontains=value)
         )
         return queryset.filter(qs_filter)
