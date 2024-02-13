@@ -46,11 +46,7 @@ def load_data(type_choice):
                 )
                 created += 1
 
-    return {
-        'loaded': loaded,
-        'created': created,
-        'updated': updated
-    }
+    return loaded, created, updated
 
 
 def related_object_forms():
