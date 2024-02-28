@@ -1,4 +1,5 @@
 {% extends 'generic/object_list.html' %}
+{% load buttons %}
 
 {% block title %}DeviceType Imports{% endblock %}
 
@@ -16,12 +17,22 @@
         {% endif %}
     </div>
 {% endblock %}
+
 {% block bulk_buttons %}
     {% if perms.netbox_metatype_importer.add_metadevicetype %}
         <button type="submit" name="_edit" formaction="
+
                 {% url 'plugins:netbox_metatype_importer:metadevicetype_import' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
                 class="btn btn-warning btn-sm">
             <span class="mdi mdi-upload" aria-hidden="true"></span> Import Selected
+        </button>
+    {% endif %}
+    {% if perms.netbox_metatype_importer.delete_metadevicetype %}
+        <button type="submit" name="_edit" formaction="
+
+                {% url 'plugins:netbox_metatype_importer:bulk_metadevicetype_delete' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
+                class="btn btn-danger btn-sm">
+            <span class="mdi mdi-trash-can-outline" aria-hidden="true"></span> Delete Selected
         </button>
     {% endif %}
 {% endblock %}

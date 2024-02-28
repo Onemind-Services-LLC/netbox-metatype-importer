@@ -22,7 +22,6 @@ from .forms import MetaTypeFilterForm
 from .gql import GQLError, GitHubGqlAPI
 from .models import MetaType
 from .tables import MetaTypeTable
-from .utils import *
 
 
 class MetaDeviceTypeListView(generic.ObjectListView):
@@ -50,12 +49,49 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
         return 'netbox_metatype_importer.add_metatype'
 
     def post(self, request):
+        loaded = 0
+        created = 0
+        updated = 0
         return_url = self.get_return_url(request)
 
         if not request.user.has_perm('netbox_metatype_importer.add_metatype'):
             return HttpResponseForbidden()
-        created, updated, loaded = load_data(self.path)
-        messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
+        plugin_settings = settings.PLUGINS_CONFIG.get('netbox_metatype_importer', {})
+        token = plugin_settings.get('github_token')
+        repo = plugin_settings.get('repo')
+        branch = plugin_settings.get('branch')
+        owner = plugin_settings.get('repo_owner')
+        gh_api = GitHubGqlAPI(token=token, owner=owner, repo=repo, branch=branch, path=self.path)
+        try:
+            models = gh_api.get_tree()
+        except GQLError as e:
+            messages.error(request, message=f'GraphQL API Error: {e.message}')
+            return redirect('plugins:netbox_metatype_importer:metadevicetype_list')
+
+        if models is None:
+            messages.error(request, 'Check your plugin settings and try again')
+            models = {}
+
+        for vendor, models in models.items():
+            for model, model_data in models.items():
+                loaded += 1
+                try:
+                    metadevietype = MetaType.objects.get(vendor=vendor, name=model, type=self.path)
+                    if metadevietype.sha != model_data['sha']:
+                        metadevietype.is_new = True
+                        # catch save exception
+                        metadevietype.save()
+                        updated += 1
+                    else:
+                        metadevietype.is_new = False
+                        metadevietype.save()
+                    continue
+                except ObjectDoesNotExist:
+                    # its new
+                    MetaType.objects.create(vendor=vendor, name=model, sha=model_data['sha'], type=self.path)
+                    created += 1
+        if models:
+            messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
         return redirect(return_url)
 
 
@@ -74,6 +110,19 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
     type_model = None
     model_form = None
     related_object = None
+
+    related_object_forms = OrderedDict(
+        (
+            ('console-ports', forms.ConsolePortTemplateImportForm),
+            ('console-server-ports', forms.ConsoleServerPortTemplateImportForm),
+            ('power-ports', forms.PowerPortTemplateImportForm),
+            ('power-outlets', forms.PowerOutletTemplateImportForm),
+            ('interfaces', forms.InterfaceTemplateImportForm),
+            ('rear-ports', forms.RearPortTemplateImportForm),
+            ('front-ports', forms.FrontPortTemplateImportForm),
+            ('device-bays', forms.DeviceBayTemplateImportForm),
+        )
+    )
 
     def get_required_permission(self):
         return 'netbox_metatype_importer.add_metatype'
@@ -100,6 +149,15 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
         branch = plugin_settings.get('branch')
         owner = plugin_settings.get('repo_owner')
 
+        self.related_object_forms.popitem()
+        self.related_object_forms.update(
+            {
+                'module-bays': forms.ModuleBayTemplateImportForm,
+                'device-bays': forms.DeviceBayTemplateImportForm,
+                'inventory-items': forms.InventoryItemTemplateImportForm,
+            }
+        )
+
         gh_api = GitHubGqlAPI(token=token, owner=owner, repo=repo, branch=branch, path=self.type)
 
         query_data = {}
@@ -113,7 +171,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                     _mdt.save()
         vendors_for_cre = set(model.objects.filter(pk__in=pk_list).values_list('vendor', flat=True).distinct())
         for vendor, name, sha in model.objects.filter(pk__in=pk_list, is_imported=False).values_list(
-                'vendor', 'name', 'sha'
+            'vendor', 'name', 'sha'
         ):
             query_data[sha] = f'{vendor}/{name}'
         if not query_data:
@@ -141,16 +199,12 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
 
                 model_form = self.model_form(data)
 
-                for field_name, field in model_form.fields.items():
-                    if field_name not in data and hasattr(field, 'initial'):
-                        model_form.data[field_name] = field.initial
-
                 if model_form.is_valid():
                     try:
                         with transaction.atomic():
                             obj = model_form.save()
 
-                            for field_name, related_object_form in related_object_forms().items():
+                            for field_name, related_object_form in self.related_object_forms.items():
                                 related_obj_pks = []
                                 for i, rel_obj_data in enumerate(data.get(field_name, list())):
                                     rel_obj_data.update({self.related_object: obj})
@@ -189,9 +243,9 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                 messages.error(request, f'Failed: {errored}')
             qparams = urlencode({'id': imported_dt}, doseq=True)
             # Black magic to get the url path from the type
-            return redirect(reverse(f'dcim:{str(self.type).replace("-", "").rstrip("s")}_list') + '?' + qparams)
+            return redirect(reverse(f'dcim:{self.type_model._meta.model_name}_list') + '?' + qparams)
         else:
-            messages.error(request, 'Can not import Device Types')
+            messages.error(request, f'Can not import {self.type_model.__name__}')
             return redirect(return_url)
 
 
@@ -209,3 +263,13 @@ class MetaModuleTypeImportView(GenericTypeImportView):
     type_model = ModuleType
     model_form = forms.ModuleTypeImportForm
     related_object = 'module_type'
+
+
+class MetaDeviceTypeBulkDeleteView(generic.BulkDeleteView):
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE)
+    table = MetaTypeTable
+
+
+class MetaModuleTypeBulkDeleteView(generic.BulkDeleteView):
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
+    table = MetaTypeTable
