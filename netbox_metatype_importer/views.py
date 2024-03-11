@@ -22,6 +22,7 @@ from .forms import MetaTypeFilterForm
 from .gql import GQLError, GitHubGqlAPI
 from .models import MetaType
 from .tables import MetaTypeTable
+from .utils import *
 
 
 class MetaDeviceTypeListView(generic.ObjectListView):
@@ -49,49 +50,12 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
         return 'netbox_metatype_importer.add_metatype'
 
     def post(self, request):
-        loaded = 0
-        created = 0
-        updated = 0
         return_url = self.get_return_url(request)
 
         if not request.user.has_perm('netbox_metatype_importer.add_metatype'):
             return HttpResponseForbidden()
-        plugin_settings = settings.PLUGINS_CONFIG.get('netbox_metatype_importer', {})
-        token = plugin_settings.get('github_token')
-        repo = plugin_settings.get('repo')
-        branch = plugin_settings.get('branch')
-        owner = plugin_settings.get('repo_owner')
-        gh_api = GitHubGqlAPI(token=token, owner=owner, repo=repo, branch=branch, path=self.path)
-        try:
-            models = gh_api.get_tree()
-        except GQLError as e:
-            messages.error(request, message=f'GraphQL API Error: {e.message}')
-            return redirect('plugins:netbox_metatype_importer:metadevicetype_list')
-
-        if models is None:
-            messages.error(request, 'Check your plugin settings and try again')
-            models = {}
-
-        for vendor, models in models.items():
-            for model, model_data in models.items():
-                loaded += 1
-                try:
-                    metadevietype = MetaType.objects.get(vendor=vendor, name=model, type=self.path)
-                    if metadevietype.sha != model_data['sha']:
-                        metadevietype.is_new = True
-                        # catch save exception
-                        metadevietype.save()
-                        updated += 1
-                    else:
-                        metadevietype.is_new = False
-                        metadevietype.save()
-                    continue
-                except ObjectDoesNotExist:
-                    # its new
-                    MetaType.objects.create(vendor=vendor, name=model, sha=model_data['sha'], type=self.path)
-                    created += 1
-        if models:
-            messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
+        created, updated, loaded = load_data(self.path)
+        messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
         return redirect(return_url)
 
 
@@ -110,19 +74,6 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
     type_model = None
     model_form = None
     related_object = None
-
-    related_object_forms = OrderedDict(
-        (
-            ('console-ports', forms.ConsolePortTemplateImportForm),
-            ('console-server-ports', forms.ConsoleServerPortTemplateImportForm),
-            ('power-ports', forms.PowerPortTemplateImportForm),
-            ('power-outlets', forms.PowerOutletTemplateImportForm),
-            ('interfaces', forms.InterfaceTemplateImportForm),
-            ('rear-ports', forms.RearPortTemplateImportForm),
-            ('front-ports', forms.FrontPortTemplateImportForm),
-            ('device-bays', forms.DeviceBayTemplateImportForm),
-        )
-    )
 
     def get_required_permission(self):
         return 'netbox_metatype_importer.add_metatype'
@@ -148,15 +99,6 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
         repo = plugin_settings.get('repo')
         branch = plugin_settings.get('branch')
         owner = plugin_settings.get('repo_owner')
-
-        self.related_object_forms.popitem()
-        self.related_object_forms.update(
-            {
-                'module-bays': forms.ModuleBayTemplateImportForm,
-                'device-bays': forms.DeviceBayTemplateImportForm,
-                'inventory-items': forms.InventoryItemTemplateImportForm,
-            }
-        )
 
         gh_api = GitHubGqlAPI(token=token, owner=owner, repo=repo, branch=branch, path=self.type)
 
@@ -204,7 +146,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                         with transaction.atomic():
                             obj = model_form.save()
 
-                            for field_name, related_object_form in self.related_object_forms.items():
+                            for field_name, related_object_form in related_object_forms().items():
                                 related_obj_pks = []
                                 for i, rel_obj_data in enumerate(data.get(field_name, list())):
                                     rel_obj_data.update({self.related_object: obj})
