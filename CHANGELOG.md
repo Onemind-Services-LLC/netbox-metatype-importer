@@ -1,5 +1,34 @@
 # Changelog
 
+## [v0.2.1](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.2.1) (2024-03-11)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.1.2...v0.2.1)
+
+**Closed issues:**
+
+- \[Feature\]: Ability to programmatically import device types [\#6](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/6)
+
+## [v0.1.2](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.1.2) (2024-02-13)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.3.0...v0.1.2)
+
+**Closed issues:**
+
+- Support git based data sources [\#22](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/22)
+- \[Feature\]: Return to importer after adding device [\#15](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/15)
+
+## [v0.3.0](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.3.0) (2024-01-18)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.2.0...v0.3.0)
+
+**Closed issues:**
+
+- Add support for Netbox 3.7.x [\#35](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/35)
+
+**Merged pull requests:**
+
+- Release v0.3.0 [\#37](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/37) ([kprince28](https://github.com/kprince28))
+
 ## [v0.2.0](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.2.0) (2024-01-16)
 
 [Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.1.1...v0.2.0)
