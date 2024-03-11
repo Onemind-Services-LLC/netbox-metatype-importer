@@ -38,28 +38,25 @@ def load_data(type_choice):
                     meta_type.save()
                 continue
             except ObjectDoesNotExist:
-                MetaType.objects.create(
-                    vendor=vendor,
-                    name=model,
-                    sha=model_data['sha'],
-                    type=type_choice
-                )
+                MetaType.objects.create(vendor=vendor, name=model, sha=model_data['sha'], type=type_choice)
                 created += 1
 
     return loaded, created, updated
 
 
 def related_object_forms():
-    return OrderedDict((
-        ('console-ports', forms.ConsolePortTemplateImportForm),
-        ('console-server-ports', forms.ConsoleServerPortTemplateImportForm),
-        ('power-ports', forms.PowerPortTemplateImportForm),
-        ('power-outlets', forms.PowerOutletTemplateImportForm),
-        ('interfaces', forms.InterfaceTemplateImportForm),
-        ('rear-ports', forms.RearPortTemplateImportForm),
-        ('front-ports', forms.FrontPortTemplateImportForm),
-        ('device-bays', forms.DeviceBayTemplateImportForm),
-        ('inventory-items', forms.InventoryItemTemplateImportForm),
-        ('module-bays', forms.ModuleBayTemplateImportForm),
-        ('device-bays', forms.DeviceBayTemplateImportForm)
-    ))
+    return OrderedDict(
+        (
+            ('console-ports', forms.ConsolePortTemplateImportForm),
+            ('console-server-ports', forms.ConsoleServerPortTemplateImportForm),
+            ('power-ports', forms.PowerPortTemplateImportForm),
+            ('power-outlets', forms.PowerOutletTemplateImportForm),
+            ('interfaces', forms.InterfaceTemplateImportForm),
+            ('rear-ports', forms.RearPortTemplateImportForm),
+            ('front-ports', forms.FrontPortTemplateImportForm),
+            ('device-bays', forms.DeviceBayTemplateImportForm),
+            ('inventory-items', forms.InventoryItemTemplateImportForm),
+            ('module-bays', forms.ModuleBayTemplateImportForm),
+            ('device-bays', forms.DeviceBayTemplateImportForm),
+        )
+    )

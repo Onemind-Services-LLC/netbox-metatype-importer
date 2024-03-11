@@ -58,11 +58,7 @@ class MetaTypeLoadViewSetBase(BaseViewSet):
         try:
             loaded, created, updated = load_data(self.type_choice)
 
-            response_data = {
-                'loaded': loaded,
-                'created': created,
-                'updated': updated
-            }
+            response_data = {'loaded': loaded, 'created': created, 'updated': updated}
             return Response(response_data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -122,7 +118,7 @@ class MetaTypeImportViewSetBase(BaseViewSet):
                     _mdt.save()
         vendors_for_cre = set(model.objects.filter(pk__in=pk_list).values_list('vendor', flat=True).distinct())
         for vendor, name, sha in model.objects.filter(pk__in=pk_list, is_imported=False).values_list(
-                'vendor', 'name', 'sha'
+            'vendor', 'name', 'sha'
         ):
             query_data[sha] = f'{vendor}/{name}'
         if not query_data:
@@ -192,13 +188,16 @@ class MetaTypeImportViewSetBase(BaseViewSet):
 
         if imported_dt:
             if errored:
-                return Response({'message': f'Imported: {len(imported_dt)}, Failed: {errored}'},
-                                status=status.HTTP_206_PARTIAL_CONTENT)
+                return Response(
+                    {'message': f'Imported: {len(imported_dt)}, Failed: {errored}'},
+                    status=status.HTTP_206_PARTIAL_CONTENT,
+                )
             else:
                 qparams = urlencode({'id': imported_dt}, doseq=True)
                 url = reverse(f'dcim:{str(self.type).replace("-", "").rstrip("s")}_list') + '?' + qparams
-                return Response({'message': f'Imported: {len(imported_dt)}', 'url': url},
-                                status=status.HTTP_201_CREATED)
+                return Response(
+                    {'message': f'Imported: {len(imported_dt)}', 'url': url}, status=status.HTTP_201_CREATED
+                )
         else:
             return Response({'error': f'Can not import {self.type}'}, status=status.HTTP_400_BAD_REQUEST)
 
