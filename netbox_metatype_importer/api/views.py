@@ -2,72 +2,83 @@ from collections import OrderedDict
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.http import HttpResponseForbidden
-from django.shortcuts import redirect, reverse
+from django.db.models import Q
+from django.shortcuts import reverse
 from django.utils.text import slugify
-from django.views.generic import View
+from rest_framework import mixins as drf_mixins, status
+from rest_framework.response import Response
+from rest_framework.routers import APIRootView
 
 from dcim import forms
 from dcim.models import DeviceType, Manufacturer, ModuleType
-from netbox.views import generic
+from netbox.api.viewsets import BaseViewSet
+from netbox_metatype_importer.filters import MetaTypeFilterSet
+from netbox_metatype_importer.forms import MetaTypeFilterForm
 from utilities.exceptions import AbortTransaction, PermissionsViolation
 from utilities.forms.bulk_import import BulkImportForm
-from utilities.views import ContentTypePermissionRequiredMixin, GetReturnURLMixin
-from .choices import TypeChoices
-from .filters import MetaTypeFilterSet
-from .forms import MetaTypeFilterForm
-from .gql import GQLError, GitHubGqlAPI
-from .models import MetaType
-from .tables import MetaTypeTable
-from .utils import *
+from . import serializers
+from ..choices import TypeChoices
+from ..gql import GQLError, GitHubGqlAPI
+from ..models import MetaType
+from ..utils import *
 
 
-class MetaDeviceTypeListView(generic.ObjectListView):
+class MetaTypeRootView(APIRootView):
+    """
+    MetaType API root view
+    """
+
+    def get_view_name(self):
+        return 'MetaType'
+
+
+class DeviceTypeListViewSet(drf_mixins.ListModelMixin, BaseViewSet):
+    serializer_class = serializers.MetaTypeSerializer
     queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE)
-    filterset = MetaTypeFilterSet
-    filterset_form = MetaTypeFilterForm
-    table = MetaTypeTable
-    actions = ()
-    template_name = 'netbox_metatype_importer/metadevicetype_list.html'
+    filterset_class = MetaTypeFilterSet
 
 
-class MetaModuleTypeListView(generic.ObjectListView):
+class ModuleTypeListViewSet(drf_mixins.ListModelMixin, BaseViewSet):
+    serializer_class = serializers.MetaTypeSerializer
     queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
-    filterset = MetaTypeFilterSet
-    filterset_form = MetaTypeFilterForm
-    table = MetaTypeTable
-    actions = ()
-    template_name = 'netbox_metatype_importer/metamoduletype_list.html'
+    filterset_class = MetaTypeFilterSet
 
 
-class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin, View):
-    path = None
+class MetaTypeLoadViewSetBase(BaseViewSet):
+    serializer_class = serializers.MetaTypeSerializer
+    queryset = MetaType.objects.all()
+    type_choice = None
 
-    def get_required_permission(self):
-        return 'netbox_metatype_importer.add_metatype'
-
-    def post(self, request):
-        return_url = self.get_return_url(request)
-
+    def create(self, request, *args, **kwargs):
         if not request.user.has_perm('netbox_metatype_importer.add_metatype'):
-            return HttpResponseForbidden()
-        created, updated, loaded = load_data(self.path)
-        messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
-        return redirect(return_url)
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            loaded, created, updated = load_data(self.type_choice)
+
+            response_data = {
+                'loaded': loaded,
+                'created': created,
+                'updated': updated
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MetaDeviceTypeLoadView(GenericTypeLoadView):
-    path = TypeChoices.TYPE_DEVICE
+class MetaDeviceTypeLoadViewSet(MetaTypeLoadViewSetBase):
+    type_choice = TypeChoices.TYPE_DEVICE
 
 
-class MetaModuleTypeLoadView(GenericTypeLoadView):
-    path = TypeChoices.TYPE_MODULE
+class MetaModuleTypeLoadViewSet(MetaTypeLoadViewSetBase):
+    type_choice = TypeChoices.TYPE_MODULE
 
 
-class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixin, View):
+class MetaTypeImportViewSetBase(BaseViewSet):
+    serializer_class = serializers.MetaTypeSerializer
+    queryset = MetaType.objects.all()
     filterset = MetaTypeFilterSet
     filterset_form = MetaTypeFilterForm
     type = None
@@ -75,24 +86,22 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
     model_form = None
     related_object = None
 
-    def get_required_permission(self):
-        return 'netbox_metatype_importer.add_metatype'
-
-    def post(self, request):
-        return_url = self.get_return_url(request)
+    def create(self, request, *args, **kwargs):
+        if not request.user.has_perm('netbox_metatype_importer.add_metatype'):
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
         vendor_count = 0
         errored = 0
         imported_dt = []
         model = self.queryset.model
 
-        if request.POST.get('_all'):
-            if self.filterset is not None:
-                pk_list = [obj.pk for obj in self.filterset(request.GET, model.objects.only('pk')).qs]
-            else:
-                pk_list = model.objects.values_list('pk', flat=True)
+        if name := request.data.get("name"):
+            instance = MetaType.objects.filter(
+                Q(name__in=[f"{name}.yaml", f"{name}.yml", name]), type=self.type
+            ).values_list("pk", flat=True)
+            pk_list = list(instance)
         else:
-            pk_list = [int(pk) for pk in request.POST.getlist('pk')]
+            return Response({"error": "Name field is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         plugin_settings = settings.PLUGINS_CONFIG.get('netbox_metatype_importer', {})
         token = plugin_settings.get('github_token')
@@ -117,13 +126,11 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
         ):
             query_data[sha] = f'{vendor}/{name}'
         if not query_data:
-            messages.warning(request, message='Nothing to import')
-            return redirect(return_url)
+            return Response({'message': 'Nothing to import'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             dt_files = gh_api.get_files(query_data)
         except GQLError as e:
-            messages.error(request, message=f'GraphQL API Error: {e.message}')
-            return redirect(return_url)
+            return Response({'error': f'GraphQL API Error: {e.message}'}, status=status.HTTP_400_BAD_REQUEST)
 
         # create manufacturer
         for vendor in vendors_for_cre:
@@ -140,6 +147,10 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                     data = data[0]
 
                 model_form = self.model_form(data)
+
+                for field_name, field in model_form.fields.items():
+                    if field_name not in data and hasattr(field, 'initial'):
+                        model_form.data[field_name] = field.initial
 
                 if model_form.is_valid():
                     try:
@@ -178,40 +189,29 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                     metadt.save()
             else:
                 errored += 1
-        # msg
+
         if imported_dt:
-            messages.success(request, f'Imported: {imported_dt.__len__()}')
             if errored:
-                messages.error(request, f'Failed: {errored}')
-            qparams = urlencode({'id': imported_dt}, doseq=True)
-            # Black magic to get the url path from the type
-            return redirect(reverse(f'dcim:{self.type_model._meta.model_name}_list') + '?' + qparams)
+                return Response({'message': f'Imported: {len(imported_dt)}, Failed: {errored}'},
+                                status=status.HTTP_206_PARTIAL_CONTENT)
+            else:
+                qparams = urlencode({'id': imported_dt}, doseq=True)
+                url = reverse(f'dcim:{str(self.type).replace("-", "").rstrip("s")}_list') + '?' + qparams
+                return Response({'message': f'Imported: {len(imported_dt)}', 'url': url},
+                                status=status.HTTP_201_CREATED)
         else:
-            messages.error(request, f'Can not import {self.type_model.__name__}')
-            return redirect(return_url)
+            return Response({'error': f'Can not import {self.type}'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MetaDeviceTypeImportView(GenericTypeImportView):
-    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE)
+class MetaDeviceTypeImportViewSet(MetaTypeImportViewSetBase):
     type = TypeChoices.TYPE_DEVICE
     type_model = DeviceType
     model_form = forms.DeviceTypeImportForm
     related_object = 'device_type'
 
 
-class MetaModuleTypeImportView(GenericTypeImportView):
-    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
+class MetaModuleTypeImportViewSet(MetaTypeImportViewSetBase):
     type = TypeChoices.TYPE_MODULE
     type_model = ModuleType
     model_form = forms.ModuleTypeImportForm
     related_object = 'module_type'
-
-
-class MetaDeviceTypeBulkDeleteView(generic.BulkDeleteView):
-    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE)
-    table = MetaTypeTable
-
-
-class MetaModuleTypeBulkDeleteView(generic.BulkDeleteView):
-    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
-    table = MetaTypeTable

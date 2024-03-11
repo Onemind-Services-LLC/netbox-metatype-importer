@@ -12,6 +12,7 @@ class NetBoxMetatypeImporterConfig(PluginConfig):
     version = metadata.get('Version')
     author = metadata.get('Author')
     author_email = metadata.get('Author-email')
+    base_url = "meta-types"
     min_version = '3.6.0'
     max_version = '3.6.99'
     default_settings = {
