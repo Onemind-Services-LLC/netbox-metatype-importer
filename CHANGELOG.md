@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.2.1](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.2.1) (2024-03-11)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.1.2...v0.2.1)
+
+**Closed issues:**
+
+- \[Feature\]: Ability to programmatically import device types [\#6](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/6)
+
 ## [v0.1.2](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.1.2) (2024-02-13)
 
 [Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.3.0...v0.1.2)
