@@ -1,8 +1,7 @@
-from collections import OrderedDict
+import time
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import reverse
@@ -118,7 +117,7 @@ class MetaTypeImportViewSetBase(BaseViewSet):
                     _mdt.save()
         vendors_for_cre = set(model.objects.filter(pk__in=pk_list).values_list('vendor', flat=True).distinct())
         for vendor, name, sha in model.objects.filter(pk__in=pk_list, is_imported=False).values_list(
-            'vendor', 'name', 'sha'
+                'vendor', 'name', 'sha'
         ):
             query_data[sha] = f'{vendor}/{name}'
         if not query_data:
@@ -147,6 +146,9 @@ class MetaTypeImportViewSetBase(BaseViewSet):
                 for field_name, field in model_form.fields.items():
                     if field_name not in data and hasattr(field, 'initial'):
                         model_form.data[field_name] = field.initial
+
+                # Initialize the "_init_time" field with the current timestamp to ensure it's present in the form data
+                model_form.data["_init_time"] = time.time()
 
                 if model_form.is_valid():
                     try:
