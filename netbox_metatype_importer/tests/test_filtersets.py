@@ -3,6 +3,7 @@ from django.test import TestCase
 from ..filters import *
 from ..models import *
 
+
 class MetatypeImporterTests(TestCase):
     queryset = MetaType.objects.all()
     filterset = MetaTypeFilterSet
