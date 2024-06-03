@@ -1,6 +1,14 @@
 from netbox.api.routers import NetBoxRouter
 
-from .views import DeviceTypeListViewSet, ModuleTypeListViewSet, MetaDeviceTypeLoadViewSet, MetaModuleTypeLoadViewSet, MetaDeviceTypeImportViewSet, MetaModuleTypeImportViewSet, MetaTypeRootView
+from .views import (
+    DeviceTypeListViewSet,
+    ModuleTypeListViewSet,
+    MetaDeviceTypeLoadViewSet,
+    MetaModuleTypeLoadViewSet,
+    MetaDeviceTypeImportViewSet,
+    MetaModuleTypeImportViewSet,
+    MetaTypeRootView,
+)
 
 router = NetBoxRouter()
 router.APIRootView = MetaTypeRootView

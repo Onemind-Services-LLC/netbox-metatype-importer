@@ -6,6 +6,7 @@ from netbox_metatype_importer.models import MetaType
 
 class MetaTypeSerializer(serializers.ModelSerializer):
     url = HyperlinkedIdentityField(view_name="plugins-api:netbox_metatype_importer-api:metatype-detail")
+
     class Meta:
         model = MetaType
         fields = "__all__"
