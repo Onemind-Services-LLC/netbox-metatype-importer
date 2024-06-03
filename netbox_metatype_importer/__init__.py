@@ -1,6 +1,6 @@
 from importlib.metadata import metadata
 
-from extras.plugins import PluginConfig
+from netbox.plugins import PluginConfig
 
 metadata = metadata('netbox_metatype_importer')
 
@@ -13,8 +13,8 @@ class NetBoxMetatypeImporterConfig(PluginConfig):
     author = metadata.get('Author')
     author_email = metadata.get('Author-email')
     base_url = "meta-types"
-    min_version = '3.7.0'
-    max_version = '3.7.99'
+    min_version = '4.0.0'
+    max_version = '4.0.99'
     default_settings = {
         'repo_owner': 'netbox-community',
         'repo': 'devicetype-library',

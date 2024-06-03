@@ -19,7 +19,7 @@ from utilities.exceptions import AbortTransaction, PermissionsViolation
 from utilities.forms.bulk_import import BulkImportForm
 from . import serializers
 from ..choices import TypeChoices
-from ..gql import GQLError, GitHubGqlAPI
+from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 from ..models import MetaType
 from ..utils import *
 
