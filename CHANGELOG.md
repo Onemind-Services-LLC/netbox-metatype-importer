@@ -6,6 +6,7 @@
 
 **Closed issues:**
 
+- Syntax Issue [\#48](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/48)
 - Form Invalid When Importing Data Types via API Due to Missing "\_init\_time" Field [\#43](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/43)
 
 ## [v0.3.2](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.3.2) (2024-03-11)
