@@ -1,14 +1,13 @@
-from collections import OrderedDict
 from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, reverse
 from django.utils.text import slugify
 from django.views.generic import View
+from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 
 from dcim import forms
 from dcim.models import DeviceType, Manufacturer, ModuleType
@@ -19,7 +18,6 @@ from utilities.views import ContentTypePermissionRequiredMixin, GetReturnURLMixi
 from .choices import TypeChoices
 from .filters import MetaTypeFilterSet
 from .forms import MetaTypeFilterForm
-from .gql import GQLError, GitHubGqlAPI
 from .models import MetaType
 from .tables import MetaTypeTable
 from .utils import *

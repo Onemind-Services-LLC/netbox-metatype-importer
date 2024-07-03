@@ -1,5 +1,27 @@
 # Changelog
 
+## [Unreleased](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/HEAD)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.3.2...HEAD)
+
+**Closed issues:**
+
+- Syntax Issue [\#48](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/48)
+- Form Invalid When Importing Data Types via API Due to Missing "\_init\_time" Field [\#43](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/43)
+
+## [v0.3.2](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.3.2) (2024-03-11)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.2.2...v0.3.2)
+
+**Merged pull requests:**
+
+- Release v0.3.2 [\#46](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/46) ([kprince28](https://github.com/kprince28))
+- Add the \_init\_time in the form data [\#44](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/44) ([kprince28](https://github.com/kprince28))
+
+## [v0.2.2](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.2.2) (2024-03-11)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.3.1...v0.2.2)
+
 ## [v0.3.1](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.3.1) (2024-03-11)
 
 [Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.2.1...v0.3.1)

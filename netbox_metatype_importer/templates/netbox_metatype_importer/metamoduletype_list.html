@@ -21,6 +21,7 @@
         <button type="submit" name="_edit" formaction="
 
 
+
                 {% url 'plugins:netbox_metatype_importer:metamoduletype_import' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
                 class="btn btn-warning btn-sm">
             <span class="mdi mdi-upload" aria-hidden="true"></span> Import Selected
@@ -28,6 +29,7 @@
     {% endif %}
     {% if perms.netbox_metatype_importer.delete_metamoduletype %}
         <button type="submit" name="_edit" formaction="
+
 
                 {% url 'plugins:netbox_metatype_importer:bulk_metamoduletype_delete' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
                 class="btn btn-danger btn-sm">

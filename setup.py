@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='netbox-metatype-importer',
-    version='0.3.2',
+    version='0.4.0',
     description='Easily import Device and Module types from GitHub repo',
     long_description='Import MetaTypes into NetBox',
     long_description_content_type="text/markdown",

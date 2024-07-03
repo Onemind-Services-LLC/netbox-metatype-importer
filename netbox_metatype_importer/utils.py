@@ -2,9 +2,9 @@ from collections import OrderedDict
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from netbox_metatype_importer.graphql.gql import GitHubGqlAPI, GQLError
 
 from dcim import forms
-from .gql import GitHubGqlAPI, GQLError
 from .models import MetaType
 
 __all__ = ['load_data', 'related_object_forms']
