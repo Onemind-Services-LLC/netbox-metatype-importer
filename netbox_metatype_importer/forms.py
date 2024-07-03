@@ -1,10 +1,9 @@
 from django import forms
 
-from utilities.forms import BootstrapMixin
 from .models import MetaType
 
 
-class MetaTypeFilterForm(BootstrapMixin, forms.Form):
+class MetaTypeFilterForm(forms.Form):
     q = forms.CharField(required=False, label='Name')
 
     vendor = forms.CharField(required=False, label='Vendor')
