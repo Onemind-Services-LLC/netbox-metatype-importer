@@ -117,7 +117,7 @@ class MetaTypeImportViewSetBase(BaseViewSet):
                     _mdt.save()
         vendors_for_cre = set(model.objects.filter(pk__in=pk_list).values_list('vendor', flat=True).distinct())
         for vendor, name, sha in model.objects.filter(pk__in=pk_list, is_imported=False).values_list(
-                'vendor', 'name', 'sha'
+            'vendor', 'name', 'sha'
         ):
             query_data[sha] = f'{vendor}/{name}'
         if not query_data:
