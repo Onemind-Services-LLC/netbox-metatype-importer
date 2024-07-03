@@ -6,6 +6,9 @@ from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import reverse
 from django.utils.text import slugify
+from netbox_metatype_importer.filters import MetaTypeFilterSet
+from netbox_metatype_importer.forms import MetaTypeFilterForm
+from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 from rest_framework import mixins as drf_mixins, status
 from rest_framework.response import Response
 from rest_framework.routers import APIRootView
@@ -13,13 +16,10 @@ from rest_framework.routers import APIRootView
 from dcim import forms
 from dcim.models import DeviceType, Manufacturer, ModuleType
 from netbox.api.viewsets import BaseViewSet
-from netbox_metatype_importer.filters import MetaTypeFilterSet
-from netbox_metatype_importer.forms import MetaTypeFilterForm
 from utilities.exceptions import AbortTransaction, PermissionsViolation
 from utilities.forms.bulk_import import BulkImportForm
 from . import serializers
 from ..choices import TypeChoices
-from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 from ..models import MetaType
 from ..utils import *
 
@@ -117,7 +117,7 @@ class MetaTypeImportViewSetBase(BaseViewSet):
                     _mdt.save()
         vendors_for_cre = set(model.objects.filter(pk__in=pk_list).values_list('vendor', flat=True).distinct())
         for vendor, name, sha in model.objects.filter(pk__in=pk_list, is_imported=False).values_list(
-            'vendor', 'name', 'sha'
+                'vendor', 'name', 'sha'
         ):
             query_data[sha] = f'{vendor}/{name}'
         if not query_data:

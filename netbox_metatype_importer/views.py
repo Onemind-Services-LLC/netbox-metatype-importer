@@ -7,6 +7,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, reverse
 from django.utils.text import slugify
 from django.views.generic import View
+from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 
 from dcim import forms
 from dcim.models import DeviceType, Manufacturer, ModuleType
@@ -17,7 +18,6 @@ from utilities.views import ContentTypePermissionRequiredMixin, GetReturnURLMixi
 from .choices import TypeChoices
 from .filters import MetaTypeFilterSet
 from .forms import MetaTypeFilterForm
-from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 from .models import MetaType
 from .tables import MetaTypeTable
 from .utils import *
@@ -111,7 +111,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                     _mdt.save()
         vendors_for_cre = set(model.objects.filter(pk__in=pk_list).values_list('vendor', flat=True).distinct())
         for vendor, name, sha in model.objects.filter(pk__in=pk_list, is_imported=False).values_list(
-            'vendor', 'name', 'sha'
+                'vendor', 'name', 'sha'
         ):
             query_data[sha] = f'{vendor}/{name}'
         if not query_data:

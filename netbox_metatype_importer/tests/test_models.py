@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from ..models import *
 from ..choices import *
+from ..models import *
 
 
 class TestMetaTypeImporter(TestCase):
