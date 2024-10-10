@@ -13,8 +13,8 @@ class NetBoxMetatypeImporterConfig(PluginConfig):
     author = metadata.get('Author')
     author_email = metadata.get('Author-email')
     base_url = "meta-types"
-    min_version = '4.0.0'
-    max_version = '4.0.99'
+    min_version = '4.1.0'
+    max_version = '4.1.99'
     default_settings = {
         'repo_owner': 'netbox-community',
         'repo': 'devicetype-library',

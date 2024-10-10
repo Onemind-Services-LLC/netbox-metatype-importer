@@ -6,9 +6,6 @@ from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import reverse
 from django.utils.text import slugify
-from netbox_metatype_importer.filters import MetaTypeFilterSet
-from netbox_metatype_importer.forms import MetaTypeFilterForm
-from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 from rest_framework import mixins as drf_mixins, status
 from rest_framework.response import Response
 from rest_framework.routers import APIRootView
@@ -16,6 +13,9 @@ from rest_framework.routers import APIRootView
 from dcim import forms
 from dcim.models import DeviceType, Manufacturer, ModuleType
 from netbox.api.viewsets import BaseViewSet
+from netbox_metatype_importer.filters import MetaTypeFilterSet
+from netbox_metatype_importer.forms import MetaTypeFilterForm
+from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 from utilities.exceptions import AbortTransaction, PermissionsViolation
 from utilities.forms.bulk_import import BulkImportForm
 from . import serializers
