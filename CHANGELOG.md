@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/HEAD)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.3.3...HEAD)
+
+**Closed issues:**
+
+- "Select all matching query" not working. [\#50](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/50)
+
+## [v0.3.3](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.3.3) (2024-10-15)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.4.0...v0.3.3)
+
 ## [v0.4.0](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.4.0) (2024-07-03)
 
 [Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.3.2...v0.4.0)
