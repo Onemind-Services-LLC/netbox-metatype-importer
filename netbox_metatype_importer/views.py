@@ -214,6 +214,7 @@ class MetaDeviceTypeBulkDeleteView(generic.BulkDeleteView):
     filterset = MetaTypeFilterSet
     table = MetaTypeTable
 
+
 class MetaModuleTypeBulkDeleteView(generic.BulkDeleteView):
     queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
     filterset = MetaTypeFilterSet
