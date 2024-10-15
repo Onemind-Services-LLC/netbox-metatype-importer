@@ -1,26 +1,48 @@
-<!--
-#########################################################################
 
-Thank you for sharing your work and for opening a PR for the NetBox plugin.
+### Description
 
-(!) IMPORTANT (!):
-Before you proceed, please ensure that your PR is targeted at the `dev` branch!
+<!-- Please provide a brief description of the changes included in this pull request. -->
 
-Kindly review the following comments carefully and provide information
-pertaining to each relevant section.
+### Jira Issue
 
-#########################################################################
--->
-# NetBox Plugin Pull Request
+<!-- If this pull request is associated with a Jira issue, please link it here (e.g., `OMS-123`). -->
 
+- Jira Ticket: [OMS-XXXX](https://onemindservices.atlassian.net/browse/OMS-XXXX)
 
-<!--
-    Thank you for your interest in contributing to the NetBox plugin! Please note that
-    our contribution policy requires that a feature request or bug report be
-    approved and assigned prior to opening a pull request. This helps avoid
-    wasting time and effort on a proposed change that we might not be able to
-    accept.
+### Is this PR for Development?
 
-    Please specify your assigned issue number on the line below.
--->
-### Fixes: #1234
+- [ ] Yes, this PR is for the development branch.
+- [ ] No, this PR targets a different branch (please specify):
+
+### Type of Change
+
+<!-- Please select the type of change that applies to this pull request. -->
+
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation update
+- [ ] Other (please describe):
+
+### Test Cases
+
+- [ ] Test cases are covered for this PR.
+- [ ] This PR does not require test cases (please explain):
+
+### Checklist
+
+<!-- Please check off the items as they are completed. -->
+
+- [ ] I have performed a self-review of my own code.
+- [ ] I have linked all related Jira issues.
+- [ ] I have added tests that prove my fix is effective or that my feature works.
+- [ ] I have added necessary documentation (if applicable).
+- [ ] Any dependent changes have been merged and published in downstream modules.
+
+### Screenshots (if applicable)
+
+<!-- If your PR includes visual changes, please include screenshots or GIFs to illustrate them. -->
+
+### Additional Information
+
+<!-- If there's anything else you want to share about your pull request, please add it here. -->
