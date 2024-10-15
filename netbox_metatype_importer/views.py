@@ -1,21 +1,17 @@
-import logging
 from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import ProtectedError, RestrictedError
 from django.http import HttpResponseForbidden
-from django.shortcuts import redirect, reverse, render
-from django.utils.safestring import mark_safe
+from django.shortcuts import redirect, reverse
 from django.utils.text import slugify
 from django.views.generic import View
 
 from dcim import forms
 from dcim.models import DeviceType, Manufacturer, ModuleType
-from utilities.error_handlers import handle_protectederror
 from netbox.views import generic
-from utilities.exceptions import AbortTransaction, PermissionsViolation, AbortRequest
+from utilities.exceptions import AbortTransaction, PermissionsViolation
 from utilities.forms.bulk_import import BulkImportForm
 from utilities.views import ContentTypePermissionRequiredMixin, GetReturnURLMixin
 from .choices import TypeChoices
@@ -115,7 +111,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                     _mdt.save()
         vendors_for_cre = set(model.objects.filter(pk__in=pk_list).values_list('vendor', flat=True).distinct())
         for vendor, name, sha in model.objects.filter(pk__in=pk_list, is_imported=False).values_list(
-            'vendor', 'name', 'sha'
+                'vendor', 'name', 'sha'
         ):
             query_data[sha] = f'{vendor}/{name}'
         if not query_data:
