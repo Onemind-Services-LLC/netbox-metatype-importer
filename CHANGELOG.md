@@ -2,12 +2,31 @@
 
 ## [Unreleased](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/HEAD)
 
-[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.3.2...HEAD)
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.3.3...HEAD)
+
+**Closed issues:**
+
+- "Select all matching query" not working. [\#50](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/50)
+
+## [v0.3.3](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.3.3) (2024-10-15)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.4.0...v0.3.3)
+
+## [v0.4.0](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.4.0) (2024-07-03)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.3.2...v0.4.0)
 
 **Closed issues:**
 
 - Syntax Issue [\#48](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/48)
 - Form Invalid When Importing Data Types via API Due to Missing "\_init\_time" Field [\#43](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/43)
+- Add Test Cases [\#39](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/issues/39)
+
+**Merged pull requests:**
+
+- Release v0.4.0 [\#52](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/52) ([abhi1693](https://github.com/abhi1693))
+- NB-17 Support Added for NetBox v4.0 [\#51](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/51) ([yash-pal1](https://github.com/yash-pal1))
+- Test Cases Added [\#47](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/47) ([yash-pal1](https://github.com/yash-pal1))
 
 ## [v0.3.2](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.3.2) (2024-03-11)
 
