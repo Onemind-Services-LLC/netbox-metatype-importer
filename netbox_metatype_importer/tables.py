@@ -9,7 +9,7 @@ class MetaTypeTable(NetBoxTable):
     actions = columns.ActionsColumn(actions=())
 
     def render_name(self, value):
-        return '{}'.format(value.split('.')[0])
+        return '{}'.format('.'.join(value.split('.')[0:-1]))
 
     class Meta(NetBoxTable.Meta):
         model = MetaType
