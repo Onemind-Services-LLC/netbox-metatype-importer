@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.5.0](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.5.0) (2024-10-18)
+
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.4.1...v0.5.0)
+
+**Merged pull requests:**
+
+- Release v0.5.0 [\#60](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/60) ([yash-pal1](https://github.com/yash-pal1))
+- Fix name with dot before extension [\#59](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/59) ([btriller](https://github.com/btriller))
+- OMS-369 Support Added for NetBox v4.1 [\#56](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/pull/56) ([yash-pal1](https://github.com/yash-pal1))
+
 ## [v0.4.1](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.4.1) (2024-10-15)
 
 [Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.3.3...v0.4.1)
