@@ -1,6 +1,7 @@
-from netbox_metatype_importer.models import MetaType
 from rest_framework import serializers
 from rest_framework.serializers import HyperlinkedIdentityField
+
+from netbox_metatype_importer.models import MetaType
 
 
 class MetaTypeSerializer(serializers.ModelSerializer):
