@@ -7,11 +7,11 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, reverse
 from django.utils.text import slugify
 from django.views.generic import View
-from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 
 from dcim import forms
 from dcim.models import DeviceType, Manufacturer, ModuleType
 from netbox.views import generic
+from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 from utilities.exceptions import AbortTransaction, PermissionsViolation
 from utilities.forms.bulk_import import BulkImportForm
 from utilities.views import ContentTypePermissionRequiredMixin, GetReturnURLMixin

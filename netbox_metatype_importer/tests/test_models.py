@@ -1,6 +1,5 @@
 from django.test import TestCase
 
-from ..choices import *
 from ..models import *
 
 
