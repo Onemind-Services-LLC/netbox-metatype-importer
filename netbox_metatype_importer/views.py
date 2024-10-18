@@ -207,9 +207,11 @@ class MetaModuleTypeImportView(GenericTypeImportView):
 
 class MetaDeviceTypeBulkDeleteView(generic.BulkDeleteView):
     queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE)
+    filterset = MetaTypeFilterSet
     table = MetaTypeTable
 
 
 class MetaModuleTypeBulkDeleteView(generic.BulkDeleteView):
     queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
+    filterset = MetaTypeFilterSet
     table = MetaTypeTable
