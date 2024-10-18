@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/HEAD)
+## [v0.4.1](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/tree/v0.4.1) (2024-10-15)
 
-[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.3.3...HEAD)
+[Full Changelog](https://github.com/Onemind-Services-LLC/netbox-metatype-importer/compare/v0.3.3...v0.4.1)
 
 **Closed issues:**
 
