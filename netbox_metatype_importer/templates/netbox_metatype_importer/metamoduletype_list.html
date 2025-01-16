@@ -9,7 +9,7 @@
                 {% csrf_token %}
                 <button type="submit" name="_load"
                         formaction="{% url 'plugins:netbox_metatype_importer:metamoduletype_load' %}?return_url={% url 'plugins:netbox_metatype_importer:metamoduletype_list' %}"
-                        class="btn btn-primary btn-sm">
+                        class="btn btn-primary">
                     <span class="mdi mdi-download" aria-hidden="true"></span> Load
                 </button>
             </form>
@@ -19,11 +19,8 @@
 {% block bulk_buttons %}
     {% if perms.netbox_metatype_importer.add_metadevicetype %}
         <button type="submit" name="_edit" formaction="
-
-
-
                 {% url 'plugins:netbox_metatype_importer:metamoduletype_import' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
-                class="btn btn-warning btn-sm">
+                class="btn btn-warning">
             <span class="mdi mdi-upload" aria-hidden="true"></span> Import Selected
         </button>
     {% endif %}
@@ -32,7 +29,7 @@
 
 
                 {% url 'plugins:netbox_metatype_importer:bulk_metamoduletype_delete' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
-                class="btn btn-danger btn-sm">
+                class="btn btn-danger">
             <span class="mdi mdi-trash-can-outline" aria-hidden="true"></span> Delete Selected
         </button>
     {% endif %}
