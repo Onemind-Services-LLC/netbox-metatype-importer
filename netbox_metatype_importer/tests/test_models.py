@@ -6,7 +6,7 @@ from ..models import *
 class TestMetaTypeImporter(TestCase):
     def test_metatype_creation(self):
         metatype = MetaType.objects.create(
-            name='Test Metatype',
+            name='GS5104-1471-EC.yaml',
             vendor='Test Vendor',
             type=TypeChoices.TYPE_DEVICE,
             sha='sha256',
@@ -16,8 +16,8 @@ class TestMetaTypeImporter(TestCase):
             is_imported=True,
         )
 
-        self.assertEqual(metatype.__str__(), 'Test Metatype')
-        self.assertEqual(metatype.name, 'Test Metatype')
+        self.assertEqual(metatype.__str__(), 'GS5104-1471-EC')
+        self.assertEqual(metatype.name, 'GS5104-1471-EC.yaml')
         self.assertEqual(metatype.vendor, 'Test Vendor')
         self.assertEqual(metatype.type, TypeChoices.TYPE_DEVICE)
         self.assertEqual(metatype.sha, 'sha256')
