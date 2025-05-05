@@ -18,6 +18,7 @@ from utilities.views import ContentTypePermissionRequiredMixin, GetReturnURLMixi
 from .choices import TypeChoices
 from .filters import MetaTypeFilterSet
 from .forms import MetaTypeFilterForm
+from .jobs.load_devicetype import LoadData
 from .models import MetaType
 from .tables import MetaTypeTable
 from .utils import *
@@ -52,8 +53,11 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
 
         if not request.user.has_perm('netbox_metatype_importer.add_metatype'):
             return HttpResponseForbidden()
-        created, updated, loaded = load_data(self.path)
-        messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
+        LoadData.enqueue(
+            path=self.path,
+        )
+        # created, updated, loaded = load_data(self.path)
+        # messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
         return redirect(return_url)
 
 
