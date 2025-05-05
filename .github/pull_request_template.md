@@ -1,26 +1,56 @@
-<!--
-#########################################################################
 
-Thank you for sharing your work and for opening a PR for the NetBox plugin.
+### 🎟️ Jira Issue
 
-(!) IMPORTANT (!):
-Before you proceed, please ensure that your PR is targeted at the `dev` branch!
+<!-- Replace `OMS-XXXX` with the actual Jira ticket number. -->
+- Jira Ticket: [OMS-XXXX](https://onemindservices.atlassian.net/browse/OMS-XXXX)
 
-Kindly review the following comments carefully and provide information
-pertaining to each relevant section.
+### 🛠️ Type of Change
 
-#########################################################################
+<!-- Select all applicable types of changes. -->
+- [ ] Bug fix (a non-breaking change that fixes an issue)
+- [ ] New feature (a non-breaking change that adds functionality)
+- [ ] Improvement (enhancements or optimizations to existing functionality)
+- [ ] Documentation update (changes or additions to documentation)
+- [ ] Release (preparing or deploying a new release)
+- [ ] Other (please specify):
+
+### 🎯 Targeted Branch
+
+<!-- Specify the target branch, e.g., `main`, `development`, `release-v1.2`. -->
+- [ ] I have confirmed that this PR targets the correct branch.
+- **Target Branch:** `dev` <!-- Replace with the appropriate branch name -->
+
+### 🧪 Testing
+
+#### ✅ Test Coverage
+
+- [ ] I have added/updated tests that cover my changes.
+- [ ] This PR does not require tests (please explain):
+
+### 📋 Checklist
+
+<!-- Ensure all items are completed before requesting a review. -->
+- [ ] My code follows the project's coding standards.
+- [ ] I have performed a self-review of my own code.
+- [ ] I have commented my code where necessary.
+- [ ] I have linked all related Jira issues.
+- [ ] I have added necessary documentation (if applicable).
+- [ ] I have added or updated tests to cover my changes.
+- [ ] Any dependent changes have been merged and published in downstream modules.
+- [ ] I have reviewed the changes for security implications.
+- [ ] I have ensured that no sensitive information or secrets are exposed in this PR.
+
+### 📸 Screenshots (if applicable)
+
+<!-- Include screenshots or GIFs to demonstrate visual changes or new features. -->
+<!-- Example:
+![Feature Screenshot](https://link-to-screenshot.com)
 -->
-# NetBox Plugin Pull Request
 
+### 🔗 Related PRs
 
-<!--
-    Thank you for your interest in contributing to the NetBox plugin! Please note that
-    our contribution policy requires that a feature request or bug report be
-    approved and assigned prior to opening a pull request. This helps avoid
-    wasting time and effort on a proposed change that we might not be able to
-    accept.
+<!-- List any related pull requests, especially those that need to be merged before this one. -->
 
-    Please specify your assigned issue number on the line below.
--->
-### Fixes: #1234
+### 🧩 Additional Information
+
+<!-- Add any other relevant information or context about the PR that might be helpful for reviewers. -->

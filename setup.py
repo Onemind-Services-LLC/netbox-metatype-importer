@@ -1,10 +1,19 @@
+import os
+
 from setuptools import find_packages, setup
+
+description = "Easily import Device and Module types from GitHub repo"
+
+readme = os.path.join(os.path.dirname(__file__), 'README.md')
+
+with open(readme) as fh:
+    long_description = fh.read()
 
 setup(
     name='netbox-metatype-importer',
-    version='0.5.0',
-    description='Easily import Device and Module types from GitHub repo',
-    long_description='Import MetaTypes into NetBox',
+    version='0.6.0',
+    description=description,
+    long_description=long_description,
     long_description_content_type="text/markdown",
     url='https://github.com/Onemind-Services-LLC/netbox-metatype-importer',
     author='Abhimanyu Saharan',
