@@ -8,6 +8,7 @@ from django.shortcuts import redirect, reverse
 from django.utils.text import slugify
 from django.views.generic import View
 
+from collections import defaultdict
 from dcim import forms
 from dcim.models import DeviceType, Manufacturer, ModuleType
 from netbox.views import generic
@@ -132,6 +133,12 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
             manufacturer, created = Manufacturer.objects.get_or_create(name=vendor, slug=slugify(vendor))
             if created:
                 vendor_count += 1
+        gh_api.path = "elevation-images"
+        elevation_tree = gh_api.get_tree()
+        hsh = defaultdict(list)
+        for vendor, models in elevation_tree.items():
+            for model, info in models.items():
+                hsh[vendor].append(model)
 
         for sha, yaml_text in dt_files.items():
             form = BulkImportForm(data={'data': yaml_text, 'format': 'yaml'})
@@ -141,12 +148,31 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                 if isinstance(data, list):
                     data = data[0]
 
+                has_front_image = data.get('front_image', False)
+                has_rear_image = data.get('rear_image', False)
+
+                slug = data.get('slug')
+                manufacturer = data.get('manufacturer')
+
                 model_form = self.model_form(data)
 
                 if model_form.is_valid():
                     try:
                         with transaction.atomic():
                             obj = model_form.save()
+                            if has_rear_image:
+                                rear_image_path = next(
+                                    (s for s in hsh[manufacturer] if slug in s and 'rear' in s.lower()), None
+                                )
+                                rear_image_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/elevation-images/{manufacturer}/{rear_image_path}"
+                                save_image_from_url(obj, rear_image_url, 'rear_image')
+
+                            if has_front_image:
+                                front_image_path = next(
+                                    (s for s in hsh[manufacturer] if slug in s and 'front' in s.lower()), None
+                                )
+                                front_image_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/elevation-images/{manufacturer}/{front_image_path}"
+                                save_image_from_url(obj, front_image_url, 'front_image')
 
                             for field_name, related_object_form in related_object_forms().items():
                                 related_obj_pks = []
