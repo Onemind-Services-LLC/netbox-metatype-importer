@@ -57,6 +57,9 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
         LoadData.enqueue(
             path=self.path,
         )
+        messages.success(request, "We have started loading !")
+        messages.success(request, "Soon you will see a List of Loaded types !")
+
         # created, updated, loaded = load_data(self.path)
         # messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
         return redirect(return_url)
