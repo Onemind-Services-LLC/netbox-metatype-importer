@@ -25,7 +25,7 @@ def save_image_from_url(instance, image_url, field_name):
 
         getattr(instance, field_name).save(file_name, content)
     except Exception as e:
-        print(f"Error saving image from {image_url} to {field_name}: {e}")
+        return e
 
 
 def load_data(type_choice):

@@ -1,13 +1,20 @@
-from netbox_metatype_importer.jobs.base import JobRunner
+from netbox.jobs import JobRunner
+import logging
+
 from ..utils import load_data
+
+logger = logging.getLogger(__name__)
 
 
 class LoadData(JobRunner):
     class Meta:
         name = "LoadData"
 
-    def run_job(self, wait_for_job=None, *args, **kwargs):
-        super().run_job(wait_for_job=wait_for_job, *args, **kwargs)
+    def run(self, *args, **kwargs):
         path = kwargs.get("path")
-        created, updated, loaded = load_data(path)
-        print("Output is coming : .....", created, updated, loaded)
+        try:
+            logger.info("Loading Data from the source")
+            created, updated, loaded = load_data(path)
+            logger.info("Succesfully loaded the requested types", created)
+        except Exception as e:
+            logger.info("Failed to load the requested types ", e)
