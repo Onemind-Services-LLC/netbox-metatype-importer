@@ -7,18 +7,18 @@ on:
   - push
   - pull_request
 
-jobs:
-  lint:
-    uses: Onemind-Services-LLC/actions/.github/workflows/pre-commit.yml@master
-    with:
-      python-version: '3.12'
+# Add concurrency group to control job running
+concurrency:
+  group: ${{ github.event_name }}-${{ github.ref }}-${{ github.actor }}
+  cancel-in-progress: true
 
+jobs:
   test:
-    needs: lint
+    name: Run Tests
     uses: Onemind-Services-LLC/actions/.github/workflows/netbox-plugin-tests.yml@master
+    needs: js_quality
     with:
+      app-id: ${{ vars.APP_ID }}
       plugin-name: 'netbox_metatype_importer'
-      netbox-version: 'v4.3.1'
-      python-version: '3.12'
     secrets:
-      git-token: ${{ secrets.GIT_TOKEN }}
+      private-key: ${{ secrets.APP_PRIVATE_KEY }}
