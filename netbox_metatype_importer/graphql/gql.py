@@ -1,4 +1,5 @@
 import requests
+from django.conf import settings
 
 from jinja2 import Template
 
@@ -54,6 +55,16 @@ class GitHubGqlAPI:
 
     def __init__(self, url='https://api.github.com/graphql', token=None, owner=None, repo=None, branch=None, path=None):
         self.session = requests.session()
+
+        # Honor environment proxies and NetBox's HTTP_PROXIES setting if provided
+        # - trust_env ensures requests respects http_proxy/https_proxy env vars
+        # - settings.HTTP_PROXIES (if set) mirrors NetBox's outbound HTTP config
+        self.session.trust_env = True
+        http_proxies = getattr(settings, 'HTTP_PROXIES', None)
+        if http_proxies:
+            # Merge rather than replace to preserve any existing adapter defaults
+            self.session.proxies.update(http_proxies)
+
         self.session.headers.update({'Authorization': f'token {token}'})
         self.path = path
         self.url = url
