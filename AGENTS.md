@@ -37,4 +37,3 @@
 ## Security & Configuration Tips
 - Do not commit tokens. Provide `PLUGINS_CONFIG` via environment or local settings; example: `testing_configuration/configuration.py` with `github_token`.
 - Review changes for secrets and security implications before opening a PR.
-
