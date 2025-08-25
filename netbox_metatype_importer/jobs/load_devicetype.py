@@ -15,6 +15,6 @@ class LoadData(JobRunner):
         try:
             logger.info("Loading Data from the source")
             loaded, created, updated = load_data(path)
-            logger.info("Successfully loaded types: loaded=%s, created=%s, updated=%s", loaded, created, updated)
+            logger.info(f"Successfully loaded types: loaded={loaded}, created={created}, updated={updated}")
         except Exception as e:
             logger.exception("Failed to load the requested types: %s", e)
