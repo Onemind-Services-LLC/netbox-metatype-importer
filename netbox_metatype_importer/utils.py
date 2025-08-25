@@ -39,7 +39,8 @@ def load_data(type_choice):
     try:
         models = gh_api_instance.get_tree()
     except GQLError as e:
-        return Exception(f'GraphQL API Error: {e.message}')
+        # Propagate a clear, actionable error upward
+        raise GQLError(f'GraphQL API Error: {e.message}')
 
     for vendor, models_data in models.items():
         for model, model_data in models_data.items():
