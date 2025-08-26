@@ -14,7 +14,7 @@ class LoadData(JobRunner):
         path = kwargs.get("path")
         try:
             logger.info("Loading Data from the source")
-            created, updated, loaded = load_data(path)
-            logger.info("Succesfully loaded the requested types", created)
+            loaded, created, updated = load_data(path)
+            logger.info(f"Successfully loaded types: loaded={loaded}, created={created}, updated={updated}")
         except Exception as e:
-            logger.info("Failed to load the requested types ", e)
+            logger.exception("Failed to load the requested types: %s", e)

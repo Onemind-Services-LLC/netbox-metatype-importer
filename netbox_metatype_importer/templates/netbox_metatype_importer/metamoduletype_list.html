@@ -4,7 +4,7 @@
 
 {% block extra_controls %}
     <div class="pull-right noprint">
-        {% if perms.netbox_metatype_importer.add_metadevicetype %}
+        {% if perms.netbox_metatype_importer.add_metatype %}
             <form method="post">
                 {% csrf_token %}
                 <button type="submit" name="_load"
@@ -17,14 +17,14 @@
     </div>
 {% endblock %}
 {% block bulk_buttons %}
-    {% if perms.netbox_metatype_importer.add_metadevicetype %}
+    {% if perms.netbox_metatype_importer.add_metatype %}
         <button type="submit" name="_edit" formaction="
                 {% url 'plugins:netbox_metatype_importer:metamoduletype_import' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
                 class="btn btn-warning">
             <span class="mdi mdi-upload" aria-hidden="true"></span> Import Selected
         </button>
     {% endif %}
-    {% if perms.netbox_metatype_importer.delete_metamoduletype %}
+    {% if perms.netbox_metatype_importer.delete_metatype %}
         <button type="submit" name="_edit" formaction="
 
 

@@ -1,4 +1,5 @@
 import requests
+from django.conf import settings
 
 from jinja2 import Template
 
@@ -54,6 +55,16 @@ class GitHubGqlAPI:
 
     def __init__(self, url='https://api.github.com/graphql', token=None, owner=None, repo=None, branch=None, path=None):
         self.session = requests.session()
+
+        # Honor environment proxies and NetBox's HTTP_PROXIES setting if provided
+        # - trust_env ensures requests respects http_proxy/https_proxy env vars
+        # - settings.HTTP_PROXIES (if set) mirrors NetBox's outbound HTTP config
+        self.session.trust_env = True
+        http_proxies = getattr(settings, 'HTTP_PROXIES', None)
+        if http_proxies:
+            # Merge rather than replace to preserve any existing adapter defaults
+            self.session.proxies.update(http_proxies)
+
         self.session.headers.update({'Authorization': f'token {token}'})
         self.path = path
         self.url = url
@@ -64,18 +75,32 @@ class GitHubGqlAPI:
 
     def get_query(self, query):
         response = self.session.post(url=self.url, json={'query': query})
+
+        # Handle explicit HTTP auth failures from GitHub
+        if response.status_code == 401:
+            raise GQLError('GitHub token invalid or expired (401 Unauthorized)')
+
         try:
             result = response.json()
         except requests.exceptions.JSONDecodeError:
-            raise GQLError('Cant parse message from GitHub. {}'.format(response.text))
-        err = result.get('errors')
-        if err:
-            # fix that
-            raise GQLError(message=err[0].get('message'))
+            raise GQLError(f'Cannot parse response from GitHub: {response.text}')
+
+        # GraphQL often returns 200 with an 'errors' array when credentials are bad
+        errors = result.get('errors') or []
+        if errors:
+            # Prefer a friendly message on auth-related errors
+            first_msg = (errors[0] or {}).get('message', '')
+            msg_l = first_msg.lower() if isinstance(first_msg, str) else ''
+            if 'bad credentials' in msg_l or 'expired' in msg_l or 'unauthorized' in msg_l:
+                raise GQLError('GitHub token invalid or expired')
+            # Fallback to the original message
+            raise GQLError(message=first_msg or 'Unknown GraphQL error from GitHub')
+
         if response.ok:
             return result
         else:
-            raise GQLError(result.get('message'))
+            # Non-JSON or non-standard error payloads
+            raise GQLError(result.get('message') or f'GitHub API request failed: {response.status_code}')
 
     def get_tree(self):
         result = {}
