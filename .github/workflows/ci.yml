@@ -15,7 +15,7 @@ concurrency:
 jobs:
   test:
     name: Run Tests
-    uses: Onemind-Services-LLC/actions/.github/workflows/netbox-plugin-tests.yml@master
+    uses: Onemind-Services-LLC/actions/.github/workflows/netbox-plugin-tests.yml@01c90ee5831e265c54e7a6d89acac7fa6669cfca
     with:
       app-id: ${{ vars.APP_ID }}
       plugin-name: 'netbox_metatype_importer'
