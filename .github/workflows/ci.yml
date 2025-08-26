@@ -12,6 +12,7 @@ concurrency:
 permissions:
   checks: write
   contents: read
+  pull-requests: write
 
 jobs:
   test:
