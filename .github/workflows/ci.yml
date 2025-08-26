@@ -21,6 +21,6 @@ jobs:
     with:
       app-id: ${{ vars.APP_ID }}
       plugin-name: 'netbox_metatype_importer'
-      plugin-configuration: '{"github_token": "ghp_XXXXXXXXXXXXXXXXXXXXXX"}'
+      plugin-configuration: '{"github_token": "ghp_XXXXXXXXXXXXXXXXXXXXXXX"}'
     secrets:
       private-key: ${{ secrets.APP_PRIVATE_KEY }}
