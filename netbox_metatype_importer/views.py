@@ -137,11 +137,23 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
             if created:
                 vendor_count += 1
         gh_api.path = "elevation-images"
-        elevation_tree = gh_api.get_tree()
         hsh = defaultdict(list)
-        for vendor, models in elevation_tree.items():
-            for model, info in models.items():
-                hsh[vendor].append(model)
+        try:
+            elevation_tree = gh_api.get_tree()
+            if elevation_tree is None:
+                raise ValueError("Elevation tree is None")
+
+            try:
+                for vendor, models in elevation_tree.items():
+                    try:
+                        for model, info in models.items():
+                            hsh[vendor].append(model)
+                    except AttributeError as e:
+                        print(f"Error processing models for vendor {vendor}: {e}")
+            except AttributeError as e:
+                print(f"Error accessing items in elevation_tree: {e}")
+        except Exception as e:
+            print(f"Failed to retrieve elevation tree: {e}")
 
         for sha, yaml_text in dt_files.items():
             form = BulkImportForm(data={'data': yaml_text, 'format': 'yaml'})
