@@ -13,4 +13,9 @@ urlpatterns = [
     path('meta-module-types/load/', views.MetaModuleTypeLoadView.as_view(), name='metamoduletype_load'),
     path('meta-module-types/import/', views.MetaModuleTypeImportView.as_view(), name='metamoduletype_import'),
     path('meta-module-types/delete/', views.MetaModuleTypeBulkDeleteView.as_view(), name='bulk_metamoduletype_delete'),
+    # Rack types
+    path('meta-rack-types/', views.MetaRackTypeListView.as_view(), name='metaracktype_list'),
+    path('meta-rack-types/load/', views.MetaRackTypeLoadView.as_view(), name='metaracktype_load'),
+    path('meta-rack-types/import/', views.MetaRackTypeImportView.as_view(), name='metaracktype_import'),
+    path('meta-rack-types/delete/', views.MetaModuleTypeBulkDeleteView.as_view(), name='bulk_metaracktype_delete'),
 ]

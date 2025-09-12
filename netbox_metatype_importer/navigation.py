@@ -11,4 +11,9 @@ menu_items = (
         link_text='ModuleType Import',
         permissions=['netbox_metatype_importer.view_metatype'],
     ),
+    PluginMenuItem(
+        link='plugins:netbox_metatype_importer:metaracktype_list',
+        link_text='RackType Import',
+        permissions=['netbox_metatype_importer.view_metatype'],
+    ),
 )
