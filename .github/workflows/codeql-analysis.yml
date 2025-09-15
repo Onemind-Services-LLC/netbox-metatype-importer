@@ -21,3 +21,6 @@ jobs:
     uses: Onemind-Services-LLC/actions/.github/workflows/codeql-analysis.yml@master
     with:
       languages: ${{ matrix.language }}
+      app-id: ${{ vars.APP_ID }}
+    secrets:
+      private-key: ${{ secrets.APP_PRIVATE_KEY }}
