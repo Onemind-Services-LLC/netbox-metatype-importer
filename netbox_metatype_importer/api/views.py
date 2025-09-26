@@ -231,5 +231,5 @@ class MetaModuleTypeImportViewSet(MetaTypeImportViewSetBase):
 class MetaRackTypeImportViewSet(MetaTypeImportViewSetBase):
     type = TypeChoices.TYPE_RACK
     type_model = RackType
-    model_form = forms.ModuleTypeImportForm
+    model_form = forms.RackTypeImportForm
     related_object = 'rack_type'
