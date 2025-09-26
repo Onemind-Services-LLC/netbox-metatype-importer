@@ -10,7 +10,6 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  checks: write
   contents: read
   pull-requests: write
 
@@ -21,6 +20,6 @@ jobs:
     with:
       app-id: ${{ vars.APP_ID }}
       plugin-name: 'netbox_metatype_importer'
-      plugin-configuration: '{"github_token": "ghp_XXXXXXXXXXXXXXXXXXXXXXX"}'
+      plugin-configuration: '{"github_token": "ghp_XXXXXXXXXXXXXXXXXXXXXX"}'
     secrets:
       private-key: ${{ secrets.APP_PRIVATE_KEY }}

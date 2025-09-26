@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.routers import APIRootView
 
 from dcim import forms
-from dcim.models import DeviceType, Manufacturer, ModuleType
+from dcim.models import DeviceType, Manufacturer, ModuleType, RackType
 from netbox.api.viewsets import BaseViewSet
 from netbox_metatype_importer.filters import MetaTypeFilterSet
 from netbox_metatype_importer.forms import MetaTypeFilterForm
@@ -35,13 +35,19 @@ class MetaTypeRootView(APIRootView):
 
 class DeviceTypeListViewSet(drf_mixins.ListModelMixin, BaseViewSet):
     serializer_class = serializers.MetaTypeSerializer
-    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE)
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE).order_by('id')
     filterset_class = MetaTypeFilterSet
 
 
 class ModuleTypeListViewSet(drf_mixins.ListModelMixin, BaseViewSet):
     serializer_class = serializers.MetaTypeSerializer
-    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE).order_by('id')
+    filterset_class = MetaTypeFilterSet
+
+
+class RackTypeListViewSet(drf_mixins.ListModelMixin, BaseViewSet):
+    serializer_class = serializers.MetaTypeSerializer
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_RACK)
     filterset_class = MetaTypeFilterSet
 
 
@@ -69,6 +75,10 @@ class MetaDeviceTypeLoadViewSet(MetaTypeLoadViewSetBase):
 
 class MetaModuleTypeLoadViewSet(MetaTypeLoadViewSetBase):
     type_choice = TypeChoices.TYPE_MODULE
+
+
+class MetaRackTypeLoadViewSet(MetaTypeLoadViewSetBase):
+    type_choice = TypeChoices.TYPE_RACK
 
 
 class MetaTypeImportViewSetBase(BaseViewSet):
@@ -216,3 +226,10 @@ class MetaModuleTypeImportViewSet(MetaTypeImportViewSetBase):
     type_model = ModuleType
     model_form = forms.ModuleTypeImportForm
     related_object = 'module_type'
+
+
+class MetaRackTypeImportViewSet(MetaTypeImportViewSetBase):
+    type = TypeChoices.TYPE_RACK
+    type_model = RackType
+    model_form = forms.RackTypeImportForm
+    related_object = 'rack_type'
