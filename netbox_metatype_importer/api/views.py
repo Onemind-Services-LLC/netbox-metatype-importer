@@ -35,13 +35,13 @@ class MetaTypeRootView(APIRootView):
 
 class DeviceTypeListViewSet(drf_mixins.ListModelMixin, BaseViewSet):
     serializer_class = serializers.MetaTypeSerializer
-    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE)
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE).order_by('id')
     filterset_class = MetaTypeFilterSet
 
 
 class ModuleTypeListViewSet(drf_mixins.ListModelMixin, BaseViewSet):
     serializer_class = serializers.MetaTypeSerializer
-    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE).order_by('id')
     filterset_class = MetaTypeFilterSet
 
 
