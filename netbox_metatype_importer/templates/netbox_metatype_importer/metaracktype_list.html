@@ -26,8 +26,6 @@
     {% endif %}
     {% if perms.netbox_metatype_importer.delete_metatype %}
         <button type="submit" name="_edit" formaction="
-
-
                 {% url 'plugins:netbox_metatype_importer:bulk_metaracktype_delete' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
                 class="btn btn-danger">
             <span class="mdi mdi-trash-can-outline" aria-hidden="true"></span> Delete Selected
