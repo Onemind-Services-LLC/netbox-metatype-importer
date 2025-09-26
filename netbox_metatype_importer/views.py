@@ -10,7 +10,7 @@ from django.views.generic import View
 
 from collections import defaultdict
 from dcim import forms
-from dcim.models import DeviceType, Manufacturer, ModuleType
+from dcim.models import DeviceType, Manufacturer, ModuleType, RackType
 from netbox.views import generic
 from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 from utilities.exceptions import AbortTransaction, PermissionsViolation
@@ -43,6 +43,15 @@ class MetaModuleTypeListView(generic.ObjectListView):
     template_name = 'netbox_metatype_importer/metamoduletype_list.html'
 
 
+class MetaRackTypeListView(generic.ObjectListView):
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_RACK)
+    filterset = MetaTypeFilterSet
+    filterset_form = MetaTypeFilterForm
+    table = MetaTypeTable
+    actions = ()
+    template_name = 'netbox_metatype_importer/metaracktype_list.html'
+
+
 class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin, View):
     path = None
 
@@ -71,6 +80,10 @@ class MetaDeviceTypeLoadView(GenericTypeLoadView):
 
 class MetaModuleTypeLoadView(GenericTypeLoadView):
     path = TypeChoices.TYPE_MODULE
+
+
+class MetaRackTypeLoadView(GenericTypeLoadView):
+    path = TypeChoices.TYPE_RACK
 
 
 class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixin, View):
@@ -250,6 +263,14 @@ class MetaModuleTypeImportView(GenericTypeImportView):
     related_object = 'module_type'
 
 
+class MetaRackTypeImportView(GenericTypeImportView):
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_RACK)
+    type = TypeChoices.TYPE_RACK
+    type_model = RackType
+    model_form = forms.RackTypeImportForm
+    related_object = 'rack_type'
+
+
 class MetaDeviceTypeBulkDeleteView(generic.BulkDeleteView):
     queryset = MetaType.objects.filter(type=TypeChoices.TYPE_DEVICE)
     filterset = MetaTypeFilterSet
@@ -258,5 +279,11 @@ class MetaDeviceTypeBulkDeleteView(generic.BulkDeleteView):
 
 class MetaModuleTypeBulkDeleteView(generic.BulkDeleteView):
     queryset = MetaType.objects.filter(type=TypeChoices.TYPE_MODULE)
+    filterset = MetaTypeFilterSet
+    table = MetaTypeTable
+
+
+class MetaRackTypeBulkDeleteView(generic.BulkDeleteView):
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_RACK)
     filterset = MetaTypeFilterSet
     table = MetaTypeTable

@@ -22,5 +22,6 @@ jobs:
     with:
       app-id: ${{ vars.APP_ID }}
       languages: ${{ matrix.language }}
+      app-id: ${{ vars.APP_ID }}
     secrets:
       private-key: ${{ secrets.APP_PRIVATE_KEY }}

@@ -16,6 +16,9 @@ class MetaType(models.Model):
 
     objects = RestrictedQuerySet.as_manager()
 
+    class Meta:
+        ordering = ["name"]
+
     def __str__(self):
         return '.'.join(str(self.name).split('.')[0:-1])
 
