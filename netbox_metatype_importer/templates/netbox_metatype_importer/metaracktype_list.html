@@ -8,7 +8,7 @@
             <form method="post">
                 {% csrf_token %}
                 <button type="submit" name="_load"
-                        formaction="{% url 'plugins:netbox_metatype_importer:metaracktype_load' %}?return_url={% url 'plugins:netbox_metatype_importer:metamoduletype_list' %}"
+                        formaction="{% url 'plugins:netbox_metatype_importer:metaracktype_load' %}?return_url={% url 'plugins:netbox_metatype_importer:metaracktype_list' %}"
                         class="btn btn-primary">
                     <span class="mdi mdi-download" aria-hidden="true"></span> Load
                 </button>
