@@ -1,8 +1,8 @@
 name: CI
 
 on:
-  - push: {}
-  - pull_request: {}
+  push: {}
+  pull_request: {}
 
 # Add concurrency group to control job running
 concurrency:
