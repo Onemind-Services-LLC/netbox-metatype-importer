@@ -24,7 +24,17 @@ class MetatypeImporterTests(TestCase):
             MetaType(
                 name='Test Metatype 2',
                 vendor='Test Vendor 2',
-                type=TypeChoices.TYPE_DEVICE,
+                type=TypeChoices.TYPE_RACK,
+                sha='sha256',
+                download_url='https://www.testurl2.com/',
+                is_new=False,
+                imported_dt=2,
+                is_imported=True,
+            ),
+            MetaType(
+                name='Test Metatype 3',
+                vendor='Test Vendor 2',
+                type=TypeChoices.TYPE_MODULE,
                 sha='sha256',
                 download_url='https://www.testurl2.com/',
                 is_new=False,
