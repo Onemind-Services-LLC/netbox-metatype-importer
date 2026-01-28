@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
-from django.shortcuts import reverse
+from django.urls import reverse
 from django.utils.text import slugify
 from rest_framework import mixins as drf_mixins, status
 from rest_framework.response import Response

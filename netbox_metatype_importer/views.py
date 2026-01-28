@@ -4,7 +4,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseForbidden
-from django.shortcuts import redirect, reverse
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.text import slugify
 from django.views.generic import View
 
