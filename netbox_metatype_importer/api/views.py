@@ -47,7 +47,7 @@ class ModuleTypeListViewSet(drf_mixins.ListModelMixin, BaseViewSet):
 
 class RackTypeListViewSet(drf_mixins.ListModelMixin, BaseViewSet):
     serializer_class = serializers.MetaTypeSerializer
-    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_RACK)
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_RACK).order_by('id')
     filterset_class = MetaTypeFilterSet
 
 
