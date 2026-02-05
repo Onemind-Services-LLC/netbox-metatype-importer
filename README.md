@@ -18,6 +18,7 @@ To use GraphQL API you need to set GitHub personal access token in plugin settin
 |     4.2.x      |     0.6.x      |
 |     4.3.x      |     0.7.x      |
 |     4.4.x      |     0.8.x      |
+|     4.5.x      |     0.9.x      |
 
 ## Installation
 

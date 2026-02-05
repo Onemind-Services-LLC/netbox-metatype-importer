@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
-from django.shortcuts import reverse
+from django.urls import reverse
 from django.utils.text import slugify
 from rest_framework import mixins as drf_mixins, status
 from rest_framework.response import Response
@@ -47,7 +47,7 @@ class ModuleTypeListViewSet(drf_mixins.ListModelMixin, BaseViewSet):
 
 class RackTypeListViewSet(drf_mixins.ListModelMixin, BaseViewSet):
     serializer_class = serializers.MetaTypeSerializer
-    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_RACK)
+    queryset = MetaType.objects.filter(type=TypeChoices.TYPE_RACK).order_by('id')
     filterset_class = MetaTypeFilterSet
 
 
