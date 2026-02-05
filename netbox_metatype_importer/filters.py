@@ -1,10 +1,14 @@
 import django_filters
 from django.db.models import Q
 
+from netbox.filtersets import BaseFilterSet
+from utilities.filtersets import register_filterset
+
 from .models import MetaType
 
 
-class MetaTypeFilterSet(django_filters.FilterSet):
+@register_filterset
+class MetaTypeFilterSet(BaseFilterSet):
     q = django_filters.CharFilter(
         method='search',
         label='Search',
