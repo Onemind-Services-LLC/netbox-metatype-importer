@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 
-from netbox_metatype_importer.graphql.gql import GitHubGqlAPI, GQLError
+from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 
 from .models import MetaType
 
