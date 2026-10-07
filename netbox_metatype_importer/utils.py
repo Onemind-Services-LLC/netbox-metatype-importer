@@ -1,15 +1,15 @@
 import os
 from collections import OrderedDict
-
 from urllib.request import urlopen
-from django.core.files.base import ContentFile
-from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 
 from dcim import forms
-from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
-from .models import MetaType
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.base import ContentFile
 
+from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
+
+from .models import MetaType
 
 __all__ = ['load_data', 'related_object_forms', 'save_image_from_url']
 
@@ -72,9 +72,9 @@ def related_object_forms():
             ('interfaces', forms.InterfaceTemplateImportForm),
             ('rear-ports', forms.RearPortTemplateImportForm),
             ('front-ports', forms.FrontPortTemplateImportForm),
+            ('port-mappings', forms.PortTemplateMappingImportForm),
             ('device-bays', forms.DeviceBayTemplateImportForm),
             ('inventory-items', forms.InventoryItemTemplateImportForm),
             ('module-bays', forms.ModuleBayTemplateImportForm),
-            ('device-bays', forms.DeviceBayTemplateImportForm),
         )
     )
