@@ -1,11 +1,7 @@
-from unittest.mock import patch
-
 import yaml
-
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-
 
 from dcim.models import (
     DeviceType,
@@ -14,6 +10,8 @@ from dcim.models import (
     PortTemplateMapping,
     RearPortTemplate,
 )
+from unittest.mock import patch
+
 from ..choices import TypeChoices
 from ..models import MetaType
 from ..graphql.gql import GitHubGqlAPI
