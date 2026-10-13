@@ -111,6 +111,32 @@ class GitHubGqlAPI:
             # Non-JSON or non-standard error payloads
             raise GQLError(result.get('message') or f'GitHub API request failed: {response.status_code}')
 
+
+    def get_tree_entries(self, data):
+        if not data:
+            raise GQLError("GitHub returned an empty response.")
+
+        errors = data.get("errors")
+        if errors:
+            raise GQLError(f"GitHub GraphQL error: {errors}")
+
+        repository = data.get("data", {}).get("repository")
+        if repository is None:
+            raise GQLError(
+                "Repository not found or inaccessible. "
+                "Check the repository owner, name, and token permissions."
+            )
+
+        tree = repository.get("object")
+        if tree is None:
+            raise GQLError(
+                "GitHub could not find the configured branch or path. "
+                "Check the branch and path settings."
+            )
+
+        return tree.get("entries") or []
+
+
     def get_tree(self):
         result = {}
 
@@ -127,7 +153,7 @@ class GitHubGqlAPI:
         if not data:
             return result
 
-        entries = data.get('data', {}).get('repository', {}).get('object', {}).get('entries', [])
+        entries = self.get_tree_entries(data)
 
         for vendor in entries:
             # Ignore files at the root
@@ -152,7 +178,7 @@ class GitHubGqlAPI:
             if not vendor_data:
                 continue
 
-            models = vendor_data.get('data', {}).get('repository', {}).get('object', {}).get('entries', [])
+            models = self.get_tree_entries(vendor_data)
 
             for model in models:
                 if model.get('type') != 'blob':
@@ -179,7 +205,7 @@ class GitHubGqlAPI:
         )
 
         data = self.get_query(query)
-        entries = data.get('data', {}).get('repository', {}).get('object', {}).get('entries', [])
+        entries = self.get_tree_entries(data)
 
         batch = []
 
@@ -198,7 +224,7 @@ class GitHubGqlAPI:
             )
 
             vendor_data = self.get_query(vendor_query)
-            models = vendor_data.get('data', {}).get('repository', {}).get('object', {}).get('entries', [])
+            models = self.get_tree_entries(vendor_data)
 
             for model in models:
                 if model.get('type') != 'blob':
@@ -214,17 +240,17 @@ class GitHubGqlAPI:
             yield batch
 
 
-def get_files(self, query_data):
-    """
-    data = {'sha': 'vendor/model'}
-    result = {'sha': 'yaml_text'}
-    """
-    result = {}
-    if not query_data:
+    def get_files(self, query_data):
+        """
+        data = {'sha': 'vendor/model'}
+        result = {'sha': 'yaml_text'}
+        """
+        result = {}
+        if not query_data:
+            return result
+        template = Template(self.files_query)
+        query = template.render(owner=self.owner, repo=self.repo, branch=self.branch, data=query_data, root_path=self.path)
+        data = self.get_query(query)
+        for k, v in data['data']['repository'].items():
+            result[k.replace('sha_', '')] = v['text']
         return result
-    template = Template(self.files_query)
-    query = template.render(owner=self.owner, repo=self.repo, branch=self.branch, data=query_data, root_path=self.path)
-    data = self.get_query(query)
-    for k, v in data['data']['repository'].items():
-        result[k.replace('sha_', '')] = v['text']
-    return result

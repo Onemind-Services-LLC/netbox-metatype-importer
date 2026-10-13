@@ -89,7 +89,8 @@ def load_data(type_choice, job_logger=None, job=None):
                         created += 1
                         batch_created += 1
 
-            job_logger.info(f"Batch saved: loaded={len(batch)}, " f"created={batch_created}, updated={batch_updated}")
+            if job_logger:
+                job_logger.info(f"Batch saved: loaded={len(batch)}, " f"created={batch_created}, updated={batch_updated}")
             if job:
                 job.save(update_fields=["log_entries"])
 
