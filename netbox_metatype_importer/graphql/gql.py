@@ -1,3 +1,4 @@
+import logging
 import requests
 from django.conf import settings
 
@@ -16,42 +17,50 @@ class GQLError(Exception):
 
 
 class GitHubGqlAPI:
-    tree_query = """
-{
-  repository(owner: "{{ owner }}", name: "{{ repo }}") {
-    object(expression: "{{ branch }}:{{ path }}") {
-      ... on Tree {
-        entries {
-          name
-          type
-          object {
-            ... on Tree {
-              entries {
-                name
-                type
-                oid
-              }
+    vendor_query = """
+    {
+        repository(owner: "{{ owner }}", name: "{{ repo }}") {
+            object(expression: "{{ branch }}:{{ path }}") {
+                ... on Tree {
+                    entries {
+                        name
+                        type
+                    }
+                }
             }
-          }
         }
-      }
     }
-  }
-}
-"""
+    """
+
+    models_query = """
+    {
+        repository(owner: "{{ owner }}", name: "{{ repo }}") {
+            object(expression: "{{ branch }}:{{ vendor_path }}") {
+                ... on Tree {
+                    entries {
+                        name
+                        type
+                        oid
+                    }
+                }
+            }
+        }
+    }
+    """
+
     files_query = """
-{
-    repository(owner: "{{ owner }}", name: "{{ repo }}") {
-        {% for sha, path in data.items() %}
-        sha_{{ sha }}: object(expression: "{{ branch }}:{{ root_path }}/{{ path }}") {
-            ... on Blob {
-                text
+    {
+        repository(owner: "{{ owner }}", name: "{{ repo }}") {
+            {% for sha, path in data.items() %}
+            sha_{{ sha }}: object(expression: "{{ branch }}:{{ root_path }}/{{ path }}") {
+                ... on Blob {
+                    text
+                }
             }
+            {% endfor %}
         }
-        {% endfor %}
     }
-}
-"""
+    """
 
     def __init__(self, url='https://api.github.com/graphql', token=None, owner=None, repo=None, branch=None, path=None):
         self.session = requests.session()
@@ -102,24 +111,134 @@ class GitHubGqlAPI:
             # Non-JSON or non-standard error payloads
             raise GQLError(result.get('message') or f'GitHub API request failed: {response.status_code}')
 
+
+    def get_tree_entries(self, data):
+        if not data:
+            raise GQLError("GitHub returned an empty response.")
+
+        errors = data.get("errors")
+        if errors:
+            raise GQLError(f"GitHub GraphQL error: {errors}")
+
+        repository = data.get("data", {}).get("repository")
+        if repository is None:
+            raise GQLError(
+                "Repository not found or inaccessible. "
+                "Check the repository owner, name, and token permissions."
+            )
+
+        tree = repository.get("object")
+        if tree is None:
+            raise GQLError(
+                "GitHub could not find the configured branch or path. "
+                "Check the branch and path settings."
+            )
+
+        return tree.get("entries") or []
+
+
     def get_tree(self):
         result = {}
-        template = Template(self.tree_query)
-        query = template.render(owner=self.owner, repo=self.repo, branch=self.branch, path=self.path)
+
+        # First get the vendors only
+        template = Template(self.vendor_query)
+        query = template.render(
+            owner=self.owner,
+            repo=self.repo,
+            branch=self.branch,
+            path=self.path,
+        )
         data = self.get_query(query)
+
         if not data:
             return result
 
-        try:
-            data['data']['repository']['object']['entries']
-        except TypeError:
-            return None
+        entries = self.get_tree_entries(data)
 
-        for vendor in data['data']['repository']['object']['entries']:
-            result[vendor['name']] = {}
-            for model in vendor['object'].get('entries', []):
-                result[vendor['name']].update({model['name']: {'sha': model['oid']}})
+        for vendor in entries:
+            # Ignore files at the root
+            if vendor.get('type') != 'tree':
+                continue
+
+            vendor_name = vendor['name']
+            result[vendor_name] = {}
+
+            # Now query this vendor separately
+            vendor_template = Template(self.models_query)
+
+            vendor_query = vendor_template.render(
+                owner=self.owner,
+                repo=self.repo,
+                branch=self.branch,
+                vendor_path=f'{self.path}/{vendor_name}',
+            )
+
+            vendor_data = self.get_query(vendor_query)
+
+            if not vendor_data:
+                continue
+
+            models = self.get_tree_entries(vendor_data)
+
+            for model in models:
+                if model.get('type') != 'blob':
+                    continue
+
+                result[vendor_name][model['name']] = {'sha': model['oid']}
+
         return result
+
+    def iter_tree_batches(self, batch_size=300):
+        """
+        Yield device-type metadata in batches instead of waiting for the
+        complete repository tree to be fetched.
+
+        Each item contains (vendor, model_name, sha).
+        """
+        template = Template(self.vendor_query)
+
+        query = template.render(
+            owner=self.owner,
+            repo=self.repo,
+            branch=self.branch,
+            path=self.path,
+        )
+
+        data = self.get_query(query)
+        entries = self.get_tree_entries(data)
+
+        batch = []
+
+        for vendor in entries:
+            if vendor.get('type') != 'tree':
+                continue
+
+            vendor_name = vendor['name']
+
+            vendor_template = Template(self.models_query)
+            vendor_query = vendor_template.render(
+                owner=self.owner,
+                repo=self.repo,
+                branch=self.branch,
+                vendor_path=f'{self.path}/{vendor_name}',
+            )
+
+            vendor_data = self.get_query(vendor_query)
+            models = self.get_tree_entries(vendor_data)
+
+            for model in models:
+                if model.get('type') != 'blob':
+                    continue
+
+                batch.append((vendor_name, model['name'], model['oid']))
+
+                if len(batch) >= batch_size:
+                    yield batch
+                    batch = []
+
+        if batch:
+            yield batch
+
 
     def get_files(self, query_data):
         """
@@ -130,9 +249,7 @@ class GitHubGqlAPI:
         if not query_data:
             return result
         template = Template(self.files_query)
-        query = template.render(
-            owner=self.owner, repo=self.repo, branch=self.branch, data=query_data, root_path=self.path
-        )
+        query = template.render(owner=self.owner, repo=self.repo, branch=self.branch, data=query_data, root_path=self.path)
         data = self.get_query(query)
         for k, v in data['data']['repository'].items():
             result[k.replace('sha_', '')] = v['text']

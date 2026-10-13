@@ -6,6 +6,7 @@ from django.db import transaction
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 from django.views.generic import View
 
@@ -64,11 +65,12 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
 
         if not request.user.has_perm('netbox_metatype_importer.add_metatype'):
             return HttpResponseForbidden()
-        LoadData.enqueue(
+        job = LoadData.enqueue(
             path=self.path,
         )
-        messages.success(request, "We have started loading !")
-        messages.success(request, "Soon you will see a List of Loaded types !")
+
+        job_url = reverse('core:job', kwargs={'pk': job.pk})
+        messages.success(request, mark_safe(f'Loading has started! Track the job ' f'<a href="{job_url}">here</a>.'))
 
         # created, updated, loaded = load_data(self.path)
         # messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
