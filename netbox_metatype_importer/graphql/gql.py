@@ -111,7 +111,6 @@ class GitHubGqlAPI:
             # Non-JSON or non-standard error payloads
             raise GQLError(result.get('message') or f'GitHub API request failed: {response.status_code}')
 
-
     def get_tree_entries(self, data):
         if not data:
             raise GQLError("GitHub returned an empty response.")
@@ -123,19 +122,16 @@ class GitHubGqlAPI:
         repository = data.get("data", {}).get("repository")
         if repository is None:
             raise GQLError(
-                "Repository not found or inaccessible. "
-                "Check the repository owner, name, and token permissions."
+                "Repository not found or inaccessible. " "Check the repository owner, name, and token permissions."
             )
 
         tree = repository.get("object")
         if tree is None:
             raise GQLError(
-                "GitHub could not find the configured branch or path. "
-                "Check the branch and path settings."
+                "GitHub could not find the configured branch or path. " "Check the branch and path settings."
             )
 
         return tree.get("entries") or []
-
 
     def get_tree(self):
         result = {}
@@ -239,7 +235,6 @@ class GitHubGqlAPI:
         if batch:
             yield batch
 
-
     def get_files(self, query_data):
         """
         data = {'sha': 'vendor/model'}
@@ -249,7 +244,9 @@ class GitHubGqlAPI:
         if not query_data:
             return result
         template = Template(self.files_query)
-        query = template.render(owner=self.owner, repo=self.repo, branch=self.branch, data=query_data, root_path=self.path)
+        query = template.render(
+            owner=self.owner, repo=self.repo, branch=self.branch, data=query_data, root_path=self.path
+        )
         data = self.get_query(query)
         for k, v in data['data']['repository'].items():
             result[k.replace('sha_', '')] = v['text']

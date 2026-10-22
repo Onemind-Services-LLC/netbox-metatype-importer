@@ -21,7 +21,7 @@ jobs:
       lint-runs-on: ci-small
       runs-on: ci-test
       plugin-name: 'netbox_metatype_importer'
-      netbox-version: v4.6.1
+      netbox-version: v4.7.3
       coverage-minimum: 45
     secrets:
       GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
