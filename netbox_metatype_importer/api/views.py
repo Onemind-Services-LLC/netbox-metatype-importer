@@ -1,6 +1,6 @@
 import time
 from urllib.parse import urlencode
-
+import logging
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
@@ -22,6 +22,8 @@ from . import serializers
 from ..choices import TypeChoices
 from ..models import MetaType
 from ..utils import *
+
+logger = logging.getLogger(__name__)
 
 
 class MetaTypeRootView(APIRootView):
@@ -61,11 +63,12 @@ class MetaTypeLoadViewSetBase(BaseViewSet):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         try:
-            loaded, created, updated = load_data(self.type_choice)
+            loaded, created, updated = load_data(self.type_choice, job_logger=logger)
 
             response_data = {'loaded': loaded, 'created': created, 'updated': updated}
             return Response(response_data, status=status.HTTP_200_OK)
         except Exception as e:
+            logger.exception("Failed to load metatype data for type %s", self.type_choice)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 

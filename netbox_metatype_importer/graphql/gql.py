@@ -119,17 +119,16 @@ class GitHubGqlAPI:
         if errors:
             raise GQLError(f"GitHub GraphQL error: {errors}")
 
-        repository = data.get("data", {}).get("repository")
+        response_data = data.get("data") or {}
+        repository = response_data.get("repository")
         if repository is None:
             raise GQLError(
-                "Repository not found or inaccessible. " "Check the repository owner, name, and token permissions."
+                "Repository not found or inaccessible. Check the repository owner, name, and token permissions."
             )
 
         tree = repository.get("object")
         if tree is None:
-            raise GQLError(
-                "GitHub could not find the configured branch or path. " "Check the branch and path settings."
-            )
+            raise GQLError("GitHub could not find the configured branch or path. Check the branch and path settings.")
 
         return tree.get("entries") or []
 
