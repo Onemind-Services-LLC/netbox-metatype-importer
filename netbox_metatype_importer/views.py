@@ -152,24 +152,44 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
             manufacturer, created = Manufacturer.objects.get_or_create(name=vendor, slug=slugify(vendor))
             if created:
                 vendor_count += 1
+
+        # Find manufacturers whose selected YAML files reference images.
+        image_vendors = set()
+
+        for yaml_text in dt_files.values():
+            form = BulkImportForm(
+                data={'data': yaml_text, 'format': 'yaml'}
+            )
+
+            if not form.is_valid():
+                continue
+
+            data = form.cleaned_data['data']
+            if isinstance(data, list):
+                data = data[0]
+
+            if data.get('front_image') or data.get('rear_image'):
+                manufacturer = data.get('manufacturer')
+                if manufacturer:
+                    image_vendors.add(manufacturer)
+
         gh_api.path = "elevation-images"
         hsh = defaultdict(list)
-        try:
-            elevation_tree = gh_api.get_tree()
-            if elevation_tree is None:
-                raise ValueError("Elevation tree is None")
 
+        # Fetch image metadata only if at least one selected YAML needs images.
+        if image_vendors:
             try:
+                elevation_tree = gh_api.get_tree(image_vendors)
+
                 for vendor, models in elevation_tree.items():
-                    try:
-                        for model, info in models.items():
-                            hsh[vendor].append(model)
-                    except AttributeError as e:
-                        print(f"Error processing models for vendor {vendor}: {e}")
-            except AttributeError as e:
-                print(f"Error accessing items in elevation_tree: {e}")
-        except Exception as e:
-            print(f"Failed to retrieve elevation tree: {e}")
+                    hsh[vendor].extend(models.keys())
+
+            except GQLError as e:
+                messages.error(
+                    request,
+                    message=f'GraphQL API Error: {e.message}'
+                )
+                return redirect(return_url)
 
         for sha, yaml_text in dt_files.items():
             form = BulkImportForm(data={'data': yaml_text, 'format': 'yaml'})

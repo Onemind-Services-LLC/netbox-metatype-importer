@@ -137,35 +137,11 @@ class GitHubGqlAPI:
         return tree.get("entries") or []
 
 
-    def get_tree(self):
+    def get_tree(self, vendors):
         result = {}
 
-        # First get the vendors only
-        template = Template(self.vendor_query)
-        query = template.render(
-            owner=self.owner,
-            repo=self.repo,
-            branch=self.branch,
-            path=self.path,
-        )
-        data = self.get_query(query)
-
-        if not data:
-            return result
-
-        entries = self.get_tree_entries(data)
-
-        for vendor in entries:
-            # Ignore files at the root
-            if vendor.get('type') != 'tree':
-                continue
-
-            vendor_name = vendor['name']
-            result[vendor_name] = {}
-
-            # Now query this vendor separately
+        for vendor_name in vendors:
             vendor_template = Template(self.models_query)
-
             vendor_query = vendor_template.render(
                 owner=self.owner,
                 repo=self.repo,
@@ -174,17 +150,13 @@ class GitHubGqlAPI:
             )
 
             vendor_data = self.get_query(vendor_query)
-
-            if not vendor_data:
-                continue
-
             models = self.get_tree_entries(vendor_data)
 
-            for model in models:
-                if model.get('type') != 'blob':
-                    continue
-
-                result[vendor_name][model['name']] = {'sha': model['oid']}
+            result[vendor_name] = {
+                model['name']: {'sha': model['oid']}
+                for model in models
+                if model.get('type') == 'blob'
+            }
 
         return result
 
