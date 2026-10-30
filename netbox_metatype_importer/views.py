@@ -157,9 +157,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
         image_vendors = set()
 
         for yaml_text in dt_files.values():
-            form = BulkImportForm(
-                data={'data': yaml_text, 'format': 'yaml'}
-            )
+            form = BulkImportForm(data={'data': yaml_text, 'format': 'yaml'})
 
             if not form.is_valid():
                 continue
@@ -185,10 +183,7 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                     hsh[vendor].extend(models.keys())
 
             except GQLError as e:
-                messages.error(
-                    request,
-                    message=f'GraphQL API Error: {e.message}'
-                )
+                messages.error(request, message=f'GraphQL API Error: {e.message}')
                 return redirect(return_url)
 
         for sha, yaml_text in dt_files.items():
