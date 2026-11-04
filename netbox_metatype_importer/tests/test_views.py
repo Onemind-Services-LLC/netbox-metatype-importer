@@ -79,6 +79,7 @@ class TestMetaDeviceTypeImportView(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
+        mock_get_tree.assert_not_called()
 
         manufacturer = Manufacturer.objects.get(slug="test-vendor")
         device_type = DeviceType.objects.get(

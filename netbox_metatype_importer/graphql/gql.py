@@ -119,7 +119,7 @@ class GitHubGqlAPI:
         if errors:
             raise GQLError(f"GitHub GraphQL error: {errors}")
 
-        repository = data.get("data", {}).get("repository")
+        repository = (data.get("data") or {}).get("repository")
         if repository is None:
             raise GQLError(
                 "Repository not found or inaccessible. " "Check the repository owner, name, and token permissions."
@@ -146,6 +146,9 @@ class GitHubGqlAPI:
             )
 
             vendor_data = self.get_query(vendor_query)
+            repository = (vendor_data.get('data') or {}).get('repository')
+            if repository is not None and repository.get('object') is None:
+                continue
             models = self.get_tree_entries(vendor_data)
 
             result[vendor_name] = {
