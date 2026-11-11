@@ -70,7 +70,7 @@ class GenericTypeLoadView(ContentTypePermissionRequiredMixin, GetReturnURLMixin,
         )
 
         job_url = reverse('core:job', kwargs={'pk': job.pk})
-        messages.success(request, mark_safe(f'Loading has started! Track the job ' f'<a href="{job_url}">here</a>.'))
+        messages.success(request, mark_safe(f'Loading has started! Track the job <a href="{job_url}">here</a>.'))
 
         # created, updated, loaded = load_data(self.path)
         # messages.success(request, f'Loaded: {loaded}, Created: {created}, Updated: {updated}')
@@ -154,21 +154,35 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                 vendor_count += 1
 
         # Find manufacturers whose selected YAML files reference images.
+        # Parse each YAML file once and reuse the parsed data.
+        parsed_files = {}
         image_vendors = set()
 
-        for yaml_text in dt_files.values():
+        for sha, yaml_text in dt_files.items():
             form = BulkImportForm(data={'data': yaml_text, 'format': 'yaml'})
 
             if not form.is_valid():
+                parsed_files[sha] = None
                 continue
 
             data = form.cleaned_data['data']
-            if isinstance(data, list):
-                data = data[0]
 
+            # Normalize YAML data.
+            if isinstance(data, list):
+                data = data[0] if data else None
+
+            # Only dictionary data can be processed as a model definition.
+            if not isinstance(data, dict):
+                parsed_files[sha] = None
+                continue
+
+            parsed_files[sha] = data
+
+            # Collect manufacturers that require elevation images.
             if data.get('front_image') or data.get('rear_image'):
                 manufacturer = data.get('manufacturer')
-                if manufacturer:
+
+                if isinstance(manufacturer, str) and manufacturer.strip():
                     image_vendors.add(manufacturer)
 
         gh_api.path = "elevation-images"
@@ -186,72 +200,68 @@ class GenericTypeImportView(ContentTypePermissionRequiredMixin, GetReturnURLMixi
                 messages.error(request, message=f'GraphQL API Error: {e.message}')
                 return redirect(return_url)
 
-        for sha, yaml_text in dt_files.items():
-            form = BulkImportForm(data={'data': yaml_text, 'format': 'yaml'})
-            if form.is_valid():
-                data = form.cleaned_data['data']
-
-                if isinstance(data, list):
-                    data = data[0]
-
-                has_front_image = data.get('front_image', False)
-                has_rear_image = data.get('rear_image', False)
-
-                slug = data.get('slug')
-                manufacturer = data.get('manufacturer')
-
-                model_form = self.model_form(data)
-
-                if model_form.is_valid():
-                    try:
-                        with transaction.atomic():
-                            obj = model_form.save()
-                            if has_rear_image:
-                                rear_image_path = next(
-                                    (s for s in hsh[manufacturer] if slug in s and 'rear' in s.lower()), None
-                                )
-                                rear_image_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/elevation-images/{manufacturer}/{rear_image_path}"
-                                save_image_from_url(obj, rear_image_url, 'rear_image')
-
-                            if has_front_image:
-                                front_image_path = next(
-                                    (s for s in hsh[manufacturer] if slug in s and 'front' in s.lower()), None
-                                )
-                                front_image_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/elevation-images/{manufacturer}/{front_image_path}"
-                                save_image_from_url(obj, front_image_url, 'front_image')
-
-                            for field_name, related_object_form in related_object_forms().items():
-                                related_obj_pks = []
-                                for i, rel_obj_data in enumerate(data.get(field_name, list())):
-                                    rel_obj_data.update({self.related_object: obj})
-                                    f = related_object_form(rel_obj_data)
-                                    for subfield_name, field in f.fields.items():
-                                        if subfield_name not in rel_obj_data and hasattr(field, 'initial'):
-                                            f.data[subfield_name] = field.initial
-                                    if f.is_valid():
-                                        related_obj = f.save()
-                                        related_obj_pks.append(related_obj.pk)
-                                    else:
-                                        for subfield_name, errors in f.errors.items():
-                                            for err in errors:
-                                                err_msg = "{}[{}] {}: {}".format(field_name, i, subfield_name, err)
-                                                model_form.add_error(None, err_msg)
-                                        raise AbortTransaction()
-                    except AbortTransaction:
-                        # log ths
-                        pass
-                    except PermissionsViolation:
-                        errored += 1
-                        continue
-                if model_form.errors:
-                    errored += 1
-                else:
-                    imported_dt.append(obj.pk)
-                    metadt = MetaType.objects.get(sha=sha)
-                    metadt.imported_dt = obj.pk
-                    metadt.save()
-            else:
+        for sha, data in parsed_files.items():
+            # Skip invalid or unsupported YAML definitions.
+            if data is None:
                 errored += 1
+                continue
+
+            has_front_image = data.get('front_image', False)
+            has_rear_image = data.get('rear_image', False)
+            slug = data.get('slug')
+            manufacturer = data.get('manufacturer')
+
+            model_form = self.model_form(data)
+
+            if model_form.is_valid():
+                try:
+                    with transaction.atomic():
+                        obj = model_form.save()
+                        if has_rear_image:
+                            rear_image_path = next(
+                                (s for s in hsh[manufacturer] if slug in s and 'rear' in s.lower()), None
+                            )
+                            rear_image_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/elevation-images/{manufacturer}/{rear_image_path}"
+                            save_image_from_url(obj, rear_image_url, 'rear_image')
+
+                        if has_front_image:
+                            front_image_path = next(
+                                (s for s in hsh[manufacturer] if slug in s and 'front' in s.lower()), None
+                            )
+                            front_image_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/elevation-images/{manufacturer}/{front_image_path}"
+                            save_image_from_url(obj, front_image_url, 'front_image')
+
+                        for field_name, related_object_form in related_object_forms().items():
+                            related_obj_pks = []
+                            for i, rel_obj_data in enumerate(data.get(field_name, list())):
+                                rel_obj_data.update({self.related_object: obj})
+                                f = related_object_form(rel_obj_data)
+                                for subfield_name, field in f.fields.items():
+                                    if subfield_name not in rel_obj_data and hasattr(field, 'initial'):
+                                        f.data[subfield_name] = field.initial
+                                if f.is_valid():
+                                    related_obj = f.save()
+                                    related_obj_pks.append(related_obj.pk)
+                                else:
+                                    for subfield_name, errors in f.errors.items():
+                                        for err in errors:
+                                            err_msg = "{}[{}] {}: {}".format(field_name, i, subfield_name, err)
+                                            model_form.add_error(None, err_msg)
+                                    raise AbortTransaction()
+                except AbortTransaction:
+                    # log ths
+                    pass
+                except PermissionsViolation:
+                    errored += 1
+                    continue
+            if model_form.errors:
+                errored += 1
+            else:
+                imported_dt.append(obj.pk)
+                metadt = MetaType.objects.get(sha=sha)
+                metadt.imported_dt = obj.pk
+                metadt.save()
+
         # msg
         if imported_dt:
             messages.success(request, f'Imported: {imported_dt.__len__()}')

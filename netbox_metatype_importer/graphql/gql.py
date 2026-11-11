@@ -1,8 +1,5 @@
-import logging
 import requests
 from django.conf import settings
-
-from jinja2 import Template
 
 
 class GQLError(Exception):
@@ -17,10 +14,18 @@ class GQLError(Exception):
 
 
 class GitHubGqlAPI:
-    vendor_query = """
-    {
-        repository(owner: "{{ owner }}", name: "{{ repo }}") {
-            object(expression: "{{ branch }}:{{ path }}") {
+    # Keep GraphQL request batching separate from the database batch size used
+    # by iter_tree_batches(). Twenty vendor trees are requested per HTTP call.
+    DEFAULT_VENDOR_BATCH_SIZE = 20
+
+    VENDOR_QUERY = """
+    query GetVendorDirectory(
+        $owner: String!,
+        $repo: String!,
+        $path: String!
+    ) {
+        repository(owner: $owner, name: $repo) {
+            object(expression: $path) {
                 ... on Tree {
                     entries {
                         name
@@ -32,49 +37,23 @@ class GitHubGqlAPI:
     }
     """
 
-    models_query = """
-    {
-        repository(owner: "{{ owner }}", name: "{{ repo }}") {
-            object(expression: "{{ branch }}:{{ vendor_path }}") {
-                ... on Tree {
-                    entries {
-                        name
-                        type
-                        oid
-                    }
-                }
-            }
-        }
-    }
-    """
-
-    files_query = """
-    {
-        repository(owner: "{{ owner }}", name: "{{ repo }}") {
-            {% for sha, path in data.items() %}
-            sha_{{ sha }}: object(expression: "{{ branch }}:{{ root_path }}/{{ path }}") {
-                ... on Blob {
-                    text
-                }
-            }
-            {% endfor %}
-        }
-    }
-    """
-
-    def __init__(self, url='https://api.github.com/graphql', token=None, owner=None, repo=None, branch=None, path=None):
+    def __init__(
+        self,
+        url="https://api.github.com/graphql",
+        token=None,
+        owner=None,
+        repo=None,
+        branch=None,
+        path=None,
+    ):
         self.session = requests.session()
-
-        # Honor environment proxies and NetBox's HTTP_PROXIES setting if provided
-        # - trust_env ensures requests respects http_proxy/https_proxy env vars
-        # - settings.HTTP_PROXIES (if set) mirrors NetBox's outbound HTTP config
+        # Honor environment proxies and NetBox's HTTP_PROXIES setting if provided.
         self.session.trust_env = True
-        http_proxies = getattr(settings, 'HTTP_PROXIES', None)
+        http_proxies = getattr(settings, "HTTP_PROXIES", None)
         if http_proxies:
-            # Merge rather than replace to preserve any existing adapter defaults
             self.session.proxies.update(http_proxies)
 
-        self.session.headers.update({'Authorization': f'token {token}'})
+        self.session.headers.update({"Authorization": f"token {token}"})
         self.path = path
         self.url = url
         self.token = token
@@ -82,34 +61,48 @@ class GitHubGqlAPI:
         self.repo = repo
         self.branch = branch
 
-    def get_query(self, query):
-        response = self.session.post(url=self.url, json={'query': query})
+    def get_query(self, query, variables=None):
+        payload = {"query": query}
+        if variables is not None:
+            payload["variables"] = variables
 
-        # Handle explicit HTTP auth failures from GitHub
+        response = self.session.post(url=self.url, json=payload)
+
         if response.status_code == 401:
-            raise GQLError('GitHub token invalid or expired (401 Unauthorized)')
+            raise GQLError("GitHub token invalid or expired (401 Unauthorized)")
 
         try:
             result = response.json()
-        except requests.exceptions.JSONDecodeError:
-            raise GQLError(f'Cannot parse response from GitHub: {response.text}')
+        except requests.exceptions.JSONDecodeError as exc:
+            raise GQLError(f"Cannot parse response from GitHub: {response.text}") from exc
 
-        # GraphQL often returns 200 with an 'errors' array when credentials are bad
-        errors = result.get('errors') or []
+        if not isinstance(result, dict):
+            raise GQLError("GitHub returned an unexpected GraphQL response.")
+
+        # GitHub may return GraphQL errors with HTTP 200, so inspect errors
+        # before relying on the HTTP status code.
+        errors = result.get("errors") or []
         if errors:
-            # Prefer a friendly message on auth-related errors
-            first_msg = (errors[0] or {}).get('message', '')
-            msg_l = first_msg.lower() if isinstance(first_msg, str) else ''
-            if 'bad credentials' in msg_l or 'expired' in msg_l or 'unauthorized' in msg_l:
-                raise GQLError('GitHub token invalid or expired')
-            # Fallback to the original message
-            raise GQLError(message=first_msg or 'Unknown GraphQL error from GitHub')
+            first_error = errors[0] or {}
+            first_message = first_error.get("message", "")
+            message_lower = first_message.lower() if isinstance(first_message, str) else ""
+            if any(phrase in message_lower for phrase in ("bad credentials", "expired", "unauthorized")):
+                raise GQLError("GitHub token invalid or expired")
+            raise GQLError(first_message or "Unknown GraphQL error from GitHub")
 
         if response.ok:
             return result
-        else:
-            # Non-JSON or non-standard error payloads
-            raise GQLError(result.get('message') or f'GitHub API request failed: {response.status_code}')
+
+        raise GQLError(result.get("message") or f"GitHub API request failed: {response.status_code}")
+
+    @staticmethod
+    def _chunks(items, chunk_size):
+        if chunk_size <= 0:
+            raise ValueError("chunk_size must be greater than zero")
+
+        items = list(items)
+        for start in range(0, len(items), chunk_size):
+            yield items[start : start + chunk_size]
 
     def get_tree_entries(self, data):
         if not data:
@@ -119,105 +112,174 @@ class GitHubGqlAPI:
         if errors:
             raise GQLError(f"GitHub GraphQL error: {errors}")
 
-        repository = data.get("data", {}).get("repository")
+        repository = (data.get("data") or {}).get("repository")
         if repository is None:
             raise GQLError(
-                "Repository not found or inaccessible. " "Check the repository owner, name, and token permissions."
+                "Repository not found or inaccessible. Check the repository owner, name, and token permissions."
             )
 
         tree = repository.get("object")
         if tree is None:
-            raise GQLError(
-                "GitHub could not find the configured branch or path. " "Check the branch and path settings."
-            )
+            raise GQLError("GitHub could not find the configured branch or path. Check the branch and path settings.")
 
         return tree.get("entries") or []
 
-    def get_tree(self, vendors):
+    def _get_vendor_trees(self, vendors, batch_size=DEFAULT_VENDOR_BATCH_SIZE):
+        # Preserve the input order while avoiding duplicate vendor requests.
+        vendors = list(dict.fromkeys(vendors or []))
+        if not vendors:
+            return {}
+
         result = {}
 
-        for vendor_name in vendors:
-            vendor_template = Template(self.models_query)
-            vendor_query = vendor_template.render(
-                owner=self.owner,
-                repo=self.repo,
-                branch=self.branch,
-                vendor_path=f'{self.path}/{vendor_name}',
-            )
-
-            vendor_data = self.get_query(vendor_query)
-            models = self.get_tree_entries(vendor_data)
-
-            result[vendor_name] = {
-                model['name']: {'sha': model['oid']} for model in models if model.get('type') == 'blob'
+        for vendor_batch in self._chunks(vendors, batch_size):
+            variable_definitions = ["$owner: String!", "$repo: String!"]
+            variables = {
+                "owner": self.owner,
+                "repo": self.repo,
             }
+            selections = []
+            aliases = []
+
+            for index, vendor_name in enumerate(vendor_batch):
+                variable_name = f"vendor_path_{index}"
+                alias = f"vendor_{index}"
+
+                variable_definitions.append(f"${variable_name}: String!")
+                variables[variable_name] = f"{self.branch}:{self.path}/{vendor_name}"
+                selections.append(
+                    f"""
+                    {alias}: object(expression: ${variable_name}) {{
+                        ... on Tree {{
+                            entries {{
+                                name
+                                type
+                                oid
+                            }}
+                        }}
+                    }}
+                    """
+                )
+                aliases.append((alias, vendor_name))
+
+            query = f"""
+            query GetVendorTrees(
+                {", ".join(variable_definitions)}
+            ) {{
+                repository(owner: $owner, name: $repo) {{
+                    {" ".join(selections)}
+                }}
+            }}
+            """
+
+            data = self.get_query(query, variables)
+            repository = (data.get("data") or {}).get("repository")
+            if repository is None:
+                raise GQLError(
+                    "Repository not found or inaccessible. Check the repository owner, name, and token permissions."
+                )
+
+            for alias, vendor_name in aliases:
+                tree = repository.get(alias)
+                # A vendor directory can disappear between discovery and this
+                # request. Preserve other results in the same batch.
+                if tree is None:
+                    continue
+
+                entries = tree.get("entries") or []
+                result[vendor_name] = {
+                    entry["name"]: {"sha": entry["oid"]}
+                    for entry in entries
+                    if entry.get("type") == "blob" and entry.get("name") and entry.get("oid")
+                }
 
         return result
 
+    def get_tree(self, vendors, batch_size=DEFAULT_VENDOR_BATCH_SIZE):
+        return self._get_vendor_trees(vendors, batch_size=batch_size)
+
     def iter_tree_batches(self, batch_size=300):
-        """
-        Yield device-type metadata in batches instead of waiting for the
-        complete repository tree to be fetched.
+        if batch_size <= 0:
+            raise ValueError("batch_size must be greater than zero")
 
-        Each item contains (vendor, model_name, sha).
-        """
-        template = Template(self.vendor_query)
-
-        query = template.render(
-            owner=self.owner,
-            repo=self.repo,
-            branch=self.branch,
-            path=self.path,
-        )
-
-        data = self.get_query(query)
+        variables = {
+            "owner": self.owner,
+            "repo": self.repo,
+            "path": f"{self.branch}:{self.path}",
+        }
+        data = self.get_query(self.VENDOR_QUERY, variables)
         entries = self.get_tree_entries(data)
+        vendors = [entry["name"] for entry in entries if entry.get("type") == "tree" and entry.get("name")]
 
         batch = []
-
-        for vendor in entries:
-            if vendor.get('type') != 'tree':
-                continue
-
-            vendor_name = vendor['name']
-
-            vendor_template = Template(self.models_query)
-            vendor_query = vendor_template.render(
-                owner=self.owner,
-                repo=self.repo,
-                branch=self.branch,
-                vendor_path=f'{self.path}/{vendor_name}',
+        for vendor_batch in self._chunks(vendors, self.DEFAULT_VENDOR_BATCH_SIZE):
+            vendor_trees = self._get_vendor_trees(
+                vendor_batch,
+                batch_size=self.DEFAULT_VENDOR_BATCH_SIZE,
             )
 
-            vendor_data = self.get_query(vendor_query)
-            models = self.get_tree_entries(vendor_data)
+            for vendor_name in vendor_batch:
+                for model_name, model_data in vendor_trees.get(vendor_name, {}).items():
+                    batch.append((vendor_name, model_name, model_data["sha"]))
 
-            for model in models:
-                if model.get('type') != 'blob':
-                    continue
-
-                batch.append((vendor_name, model['name'], model['oid']))
-
-                if len(batch) >= batch_size:
-                    yield batch
-                    batch = []
+                    if len(batch) >= batch_size:
+                        yield batch
+                        batch = []
 
         if batch:
             yield batch
 
     def get_files(self, query_data):
-        """
-        data = {'sha': 'vendor/model'}
-        result = {'sha': 'yaml_text'}
-        """
-        result = {}
         if not query_data:
-            return result
-        template = Template(self.files_query)
-        query = template.render(
-            owner=self.owner, repo=self.repo, branch=self.branch, data=query_data, root_path=self.path
-        )
-        data = self.get_query(query)
-        for k, v in data['data']['repository'].items():
-            result[k.replace('sha_', '')] = v['text']
+            return {}
+
+        variable_definitions = ["$owner: String!", "$repo: String!"]
+        variables = {
+            "owner": self.owner,
+            "repo": self.repo,
+        }
+        selections = []
+        aliases = []
+
+        for index, (sha, path) in enumerate(query_data.items()):
+            variable_name = f"file_path_{index}"
+            alias = f"file_{index}"
+
+            variable_definitions.append(f"${variable_name}: String!")
+            variables[variable_name] = f"{self.branch}:{self.path}/{path}"
+            selections.append(
+                f"""
+                {alias}: object(expression: ${variable_name}) {{
+                    ... on Blob {{
+                        text
+                    }}
+                }}
+                """
+            )
+            aliases.append((alias, sha, path))
+
+        query = f"""
+        query GetFiles(
+            {", ".join(variable_definitions)}
+        ) {{
+            repository(owner: $owner, name: $repo) {{
+                {" ".join(selections)}
+            }}
+        }}
+        """
+
+        data = self.get_query(query, variables)
+        repository = (data.get("data") or {}).get("repository")
+        if repository is None:
+            raise GQLError(
+                "Repository not found or inaccessible. Check the repository owner, name, and token permissions."
+            )
+
+        result = {}
+        for alias, sha, path in aliases:
+            blob = repository.get(alias)
+            if blob is None or blob.get("text") is None:
+                raise GQLError(f"GitHub did not return file contents for '{path}'.")
+            result[sha] = blob["text"]
+
         return result
