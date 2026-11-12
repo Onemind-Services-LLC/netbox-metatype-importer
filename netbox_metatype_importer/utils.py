@@ -1,5 +1,4 @@
 import os
-import logging
 from collections import OrderedDict
 from urllib.request import urlopen
 
@@ -12,7 +11,6 @@ from dcim import forms
 from netbox_metatype_importer.graphql.gql import GQLError, GitHubGqlAPI
 from .models import MetaType
 
-logger = logging.getLogger(__name__)
 
 __all__ = ['load_data', 'related_object_forms', 'save_image_from_url']
 
@@ -98,7 +96,7 @@ def load_data(type_choice, job_logger=None, job=None):
         raise GQLError(f'GraphQL API Error: {e.message}')
 
     if job_logger:
-        job_logger.info(f"Batch saved successfully. Processed: {loaded}")
+        job_logger.info(f"Load finished. Processed: {loaded}")
 
     return loaded, created, updated
 
