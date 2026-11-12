@@ -1,6 +1,5 @@
-from django.test import TestCase, override_settings
-
 from unittest import mock
+from django.test import TestCase, override_settings
 
 from netbox_metatype_importer.graphql.gql import GitHubGqlAPI, GQLError
 
@@ -240,3 +239,122 @@ class IterTreeBatchesTestCase(TestCase):
             with self.subTest(batch_size=batch_size):
                 with self.assertRaisesRegex(ValueError, 'batch_size must be greater than zero'):
                     list(self.api.iter_tree_batches(batch_size=batch_size))
+
+
+class GetFilesTestCase(TestCase):
+    def setUp(self):
+        self.api = GitHubGqlAPI(
+            token='token',
+            owner='netbox-community',
+            repo='devicetype-library',
+            branch='master',
+            path='device-types',
+        )
+
+    @mock.patch.object(GitHubGqlAPI, 'get_query')
+    def test_get_files_batches_requests_and_merges_results(self, mock_get_query):
+        mock_get_query.side_effect = [
+            {
+                'data': {
+                    'repository': {
+                        'file_0': {'text': ''},
+                        'file_1': {'text': 'model: Cisco-2'},
+                    }
+                }
+            },
+            {
+                'data': {
+                    'repository': {
+                        'file_0': None,
+                        'file_1': {'text': 'model: Cisco-4'},
+                    }
+                }
+            },
+            {
+                'data': {
+                    'repository': {
+                        'file_0': {'text': 'model: Cisco-5'},
+                    }
+                }
+            },
+        ]
+        query_data = {
+            'sha-1': 'Cisco/model-1.yaml',
+            'sha-2': 'Cisco/model-2.yaml',
+            'sha-3': 'Cisco/model-3.yaml',
+            'sha-4': 'Cisco/model-4.yaml',
+            'sha-5': 'Cisco/model-5.yaml',
+        }
+
+        with self.assertLogs('netbox_metatype_importer.graphql.gql', level='WARNING') as logs:
+            result = self.api.get_files(query_data, batch_size=2)
+
+        self.assertEqual(
+            result,
+            {
+                'sha-2': 'model: Cisco-2',
+                'sha-4': 'model: Cisco-4',
+                'sha-5': 'model: Cisco-5',
+            },
+        )
+        self.assertEqual(mock_get_query.call_count, 3)
+        self.assertEqual(len(logs.records), 2)
+
+        expected_batch_sizes = [2, 2, 1]
+        expected_paths = [
+            ['master:device-types/Cisco/model-1.yaml', 'master:device-types/Cisco/model-2.yaml'],
+            ['master:device-types/Cisco/model-3.yaml', 'master:device-types/Cisco/model-4.yaml'],
+            ['master:device-types/Cisco/model-5.yaml'],
+        ]
+
+        for call, expected_size, paths in zip(
+            mock_get_query.call_args_list,
+            expected_batch_sizes,
+            expected_paths,
+        ):
+            query, variables = call.args
+            file_variables = {key: value for key, value in variables.items() if key.startswith('file_path_')}
+
+            self.assertEqual(len(file_variables), expected_size)
+            self.assertEqual(
+                [file_variables[f'file_path_{index}'] for index in range(expected_size)],
+                paths,
+            )
+            self.assertIn('file_0: object', query)
+            if expected_size > 1:
+                self.assertIn('file_1: object', query)
+
+    @mock.patch.object(GitHubGqlAPI, 'get_query')
+    def test_get_files_uses_default_batch_size_of_fifty(self, mock_get_query):
+        def build_response(query, variables):
+            repository = {}
+            for key in variables:
+                if key.startswith('file_path_'):
+                    index = key.rsplit('_', 1)[1]
+                    repository[f'file_{index}'] = {'text': f'model: {variables[key]}'}
+            return {'data': {'repository': repository}}
+
+        mock_get_query.side_effect = build_response
+        query_data = {f'sha-{index}': f'Cisco/model-{index}.yaml' for index in range(51)}
+
+        result = self.api.get_files(query_data)
+
+        self.assertEqual(len(result), 51)
+        self.assertEqual(mock_get_query.call_count, 2)
+        request_sizes = [
+            sum(key.startswith('file_path_') for key in call.args[1]) for call in mock_get_query.call_args_list
+        ]
+        self.assertEqual(request_sizes, [50, 1])
+
+    @mock.patch.object(GitHubGqlAPI, 'get_query')
+    def test_get_files_returns_empty_dict_without_request_for_empty_input(self, mock_get_query):
+        self.assertEqual(self.api.get_files({}), {})
+        mock_get_query.assert_not_called()
+
+    def test_get_files_rejects_non_positive_batch_size(self):
+        query_data = {'sha-1': 'Cisco/model-1.yaml'}
+
+        for batch_size in (0, -1):
+            with self.subTest(batch_size=batch_size):
+                with self.assertRaisesRegex(ValueError, 'chunk_size must be greater than zero'):
+                    self.api.get_files(query_data, batch_size=batch_size)

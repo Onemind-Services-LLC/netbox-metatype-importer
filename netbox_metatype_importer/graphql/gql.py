@@ -1,5 +1,9 @@
+import logging
 import requests
 from django.conf import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 class GQLError(Exception):
@@ -17,6 +21,8 @@ class GitHubGqlAPI:
     # Keep GraphQL request batching separate from the database batch size used
     # by iter_tree_batches(). Twenty vendor trees are requested per HTTP call.
     DEFAULT_VENDOR_BATCH_SIZE = 20
+    # Keep file-query batching independent from vendor and database batching.
+    DEFAULT_FILE_BATCH_SIZE = 50
 
     VENDOR_QUERY = """
     query GetVendorDirectory(
@@ -229,57 +235,67 @@ class GitHubGqlAPI:
         if batch:
             yield batch
 
-    def get_files(self, query_data):
+    def get_files(self, query_data, batch_size=DEFAULT_FILE_BATCH_SIZE):
         if not query_data:
             return {}
 
-        variable_definitions = ["$owner: String!", "$repo: String!"]
-        variables = {
-            "owner": self.owner,
-            "repo": self.repo,
-        }
-        selections = []
-        aliases = []
-
-        for index, (sha, path) in enumerate(query_data.items()):
-            variable_name = f"file_path_{index}"
-            alias = f"file_{index}"
-
-            variable_definitions.append(f"${variable_name}: String!")
-            variables[variable_name] = f"{self.branch}:{self.path}/{path}"
-            selections.append(
-                f"""
-                {alias}: object(expression: ${variable_name}) {{
-                    ... on Blob {{
-                        text
-                    }}
-                }}
-                """
-            )
-            aliases.append((alias, sha, path))
-
-        query = f"""
-        query GetFiles(
-            {", ".join(variable_definitions)}
-        ) {{
-            repository(owner: $owner, name: $repo) {{
-                {" ".join(selections)}
-            }}
-        }}
-        """
-
-        data = self.get_query(query, variables)
-        repository = (data.get("data") or {}).get("repository")
-        if repository is None:
-            raise GQLError(
-                "Repository not found or inaccessible. Check the repository owner, name, and token permissions."
-            )
-
         result = {}
-        for alias, sha, path in aliases:
-            blob = repository.get(alias)
-            if blob is None or blob.get("text") is None:
-                raise GQLError(f"GitHub did not return file contents for '{path}'.")
-            result[sha] = blob["text"]
+
+        for file_batch in self._chunks(query_data.items(), batch_size):
+            variable_definitions = ["$owner: String!", "$repo: String!"]
+            variables = {
+                "owner": self.owner,
+                "repo": self.repo,
+            }
+            selections = []
+            aliases = []
+
+            for index, (sha, path) in enumerate(file_batch):
+                variable_name = f"file_path_{index}"
+                alias = f"file_{index}"
+
+                variable_definitions.append(f"${variable_name}: String!")
+                variables[variable_name] = f"{self.branch}:{self.path}/{path}"
+                selections.append(
+                    f"""
+                    {alias}: object(expression: ${variable_name}) {{
+                        ... on Blob {{
+                            text
+                        }}
+                    }}
+                    """
+                )
+                aliases.append((alias, sha, path))
+
+            query = f"""
+            query GetFiles(
+                {", ".join(variable_definitions)}
+            ) {{
+                repository(owner: $owner, name: $repo) {{
+                    {" ".join(selections)}
+                }}
+            }}
+            """
+
+            data = self.get_query(query, variables)
+            repository = (data.get("data") or {}).get("repository")
+            if repository is None:
+                raise GQLError(
+                    "Repository not found or inaccessible. Check the repository owner, name, and token permissions."
+                )
+
+            for alias, sha, path in aliases:
+                blob = repository.get(alias)
+                content = blob.get("text") if isinstance(blob, dict) else None
+
+                if not isinstance(content, str) or not content.strip():
+                    logger.warning(
+                        "Skipping GitHub file with missing or empty content: path=%s sha=%s",
+                        path,
+                        sha,
+                    )
+                    continue
+
+                result[sha] = content
 
         return result
